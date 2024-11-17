@@ -15,6 +15,9 @@
 
 
     <!-- Previous head content remains the same until style tag -->
+
+</head>
+
 <style>
     :root {
         --sidebar-width: 250px;
@@ -239,17 +242,16 @@
     }
 </style>
 
-</head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top bg-white shadow-lg">
         <div class="container-fluid">
             <!-- Sidebar Toggle -->
             <button class="btn btn-link d-lg-none me-2" id="sidebarToggle">
                 <i class="fas fa-bars"></i>
             </button>
 
-            <!-- Brand -->
+            
             <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
                 <i class="fas fa-cloud-upload-alt me-2"></i>
                 DropSpace
@@ -257,15 +259,7 @@
 
             <!-- Right Navigation -->
             <div class="ms-auto d-flex align-items-center">
-                <!-- Search -->
-                <div class="d-none d-md-block me-3">
-                    <div class="input-group">
-                        <input type="text" class="form-control border-end-0" placeholder="Search...">
-                        <span class="input-group-text bg-white border-start-0">
-                            <i class="fas fa-search text-muted"></i>
-                        </span>
-                    </div>
-                </div>
+                
 
                 <!-- Notifications -->
                 <div class="dropdown me-3">
@@ -286,25 +280,20 @@
                 <!-- Profile -->
                 <div class="dropdown">
                     <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
-                        <img src="/api/placeholder/32/32" alt="Profile" class="me-2">
-                        <span class="d-none d-md-block">John Doe</span>
+                        <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
+                        <span class="fw-bold">Username</span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-user me-2"></i> Profile
-                        </a>
-                        <a class="dropdown-item" href="#">
-                            <i class="fas fa-cog me-2"></i> Settings
-                        </a>
+                        <a class="dropdown-item" href="/profile">Profile</a>
+                        <a class="dropdown-item" href="/settings">Settings</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="#">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
+                        <a class="dropdown-item text-danger" href="/logout">Logout</a>
                     </div>
                 </div>
             </div>
         </div>
     </nav>
+
 
     <!-- Sidebar Backdrop -->
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
