@@ -1,0 +1,403 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] -  Easy File Uploads</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DropSpace.styles.css" asp-append-version="true" />
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+
+
+    <!-- Previous head content remains the same until style tag -->
+<style>
+    :root {
+        --sidebar-width: 250px;
+        --navbar-height: 60px;
+        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        --secondary-gradient: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+        --accent-gradient: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+        --surface-gradient: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+        --hover-gradient: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    }
+
+    body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+
+    /* Navbar Styles */
+    .custom-navbar {
+        height: var(--navbar-height);
+        background: var(--surface-gradient);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 0.5rem 1rem;
+        z-index: 1040;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent !important;
+        position: relative;
+    }
+
+    .navbar-brand i {
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+        width: var(--sidebar-width);
+        background: var(--surface-gradient);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 4px 0 6px -1px rgba(0, 0, 0, 0.1), 2px 0 4px -1px rgba(0, 0, 0, 0.06);
+        height: calc(100vh - var(--navbar-height));
+        position: fixed;
+        top: var(--navbar-height);
+        left: 0;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+        z-index: 1030;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: #4b5563;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-radius: 0.5rem;
+        margin: 0.25rem 0.75rem;
+    }
+
+    .sidebar-link:hover {
+        background: var(--hover-gradient);
+        color: white;
+        transform: translateX(5px);
+    }
+
+    .sidebar-link.active {
+        background: var(--primary-gradient);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+    }
+
+    .sidebar-link i {
+        width: 20px;
+        margin-right: 10px;
+    }
+
+    /* Custom Button Styles */
+    .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: var(--hover-gradient);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 8px -1px rgba(99, 102, 241, 0.5);
+    }
+
+    /* Search Bar Enhancement */
+    .search-bar {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 20px;
+        padding: 0.25rem 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .search-bar:focus-within {
+        background: white;
+        box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+    }
+
+    .search-bar input {
+        border: none;
+        background: transparent;
+    }
+
+    .search-bar input:focus {
+        box-shadow: none;
+    }
+
+    /* Profile Menu Enhancement */
+    .profile-menu {
+        background: var(--surface-gradient);
+        border-radius: 20px;
+        padding: 0.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .profile-menu:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-menu img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        background: var(--accent-gradient);
+        padding: 2px;
+    }
+
+    /* Notification Badge Enhancement */
+    .notification-badge {
+        position: relative;
+    }
+
+    .notification-badge::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 8px;
+        height: 8px;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px white;
+    }
+
+    /* Card Enhancements */
+    .card {
+        background: var(--surface-gradient);
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Footer Enhancement */
+    .custom-footer {
+        background: var(--surface-gradient);
+        border-top: 1px solid rgba(99, 102, 241, 0.1);
+        box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Dropdown Enhancements */
+    .dropdown-menu {
+        background: var(--surface-gradient);
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+    }
+
+    .dropdown-item:hover {
+        background: var(--hover-gradient);
+        color: white;
+    }
+
+    /* Mobile Responsiveness */
+    @@media (max-width: 992px) {
+        .sidebar {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(243, 244, 246, 0.95) 100%);
+        }
+
+        .sidebar-backdrop {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+
+    /* Scrollbar Customization */
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 3px;
+    }
+</style>
+
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
+        <div class="container-fluid">
+            <!-- Sidebar Toggle -->
+            <button class="btn btn-link d-lg-none me-2" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Brand -->
+            <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-cloud-upload-alt me-2"></i>
+                DropSpace
+            </a>
+
+            <!-- Right Navigation -->
+            <div class="ms-auto d-flex align-items-center">
+                <!-- Search -->
+                <div class="d-none d-md-block me-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control border-end-0" placeholder="Search...">
+                        <span class="input-group-text bg-white border-start-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Notifications -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-link text-dark notification-badge" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <h6 class="dropdown-header">Notifications</h6>
+                        <a class="dropdown-item" href="#">
+                            <small class="text-muted">Just now</small>
+                            <p class="mb-0">Your file has been uploaded</p>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-center" href="#">View all</a>
+                    </div>
+                </div>
+
+                <!-- Profile -->
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
+                        <img src="/api/placeholder/32/32" alt="Profile" class="me-2">
+                        <span class="d-none d-md-block">John Doe</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-user me-2"></i> Profile
+                        </a>
+                        <a class="dropdown-item" href="#">
+                            <i class="fas fa-cog me-2"></i> Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="#">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Sidebar -->
+    <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-md-2 col-sm-4 d-none d-sm-block">
+            <nav class="sidebar" id="sidebar">
+                <div class="py-3">
+                    <a href="#" class="sidebar-link active">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-upload"></i> Upload Files
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-folder"></i> My Files
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-share-alt"></i> Shared Files
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-star"></i> Favorites
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-trash"></i> Trash
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-chart-bar"></i> Statistics
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-question-circle"></i> Help & Support
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-10 col-sm-8 col-12">
+            <div class="main-content px-3 py-2">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="custom-footer text-muted">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    &copy; 2024 - DropSpace
+                </div>
+                <div>
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-decoration-none text-muted">Privacy</a>
+                    <span class="mx-2">·</span>
+                    <a href="#" class="text-decoration-none text-muted">Terms</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Sidebar Toggle Functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+            document.getElementById('sidebarBackdrop').classList.toggle('show');
+        });
+
+        document.getElementById('sidebarBackdrop').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('show');
+            document.getElementById('sidebarBackdrop').classList.remove('show');
+        });
+
+        // Close sidebar on window resize if we're back to desktop size
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 992) {
+                document.getElementById('sidebar').classList.remove('show');
+                document.getElementById('sidebarBackdrop').classList.remove('show');
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
