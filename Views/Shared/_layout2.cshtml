@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DropSpace</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --hover-gradient: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .custom-navbar {
+            height: 60px;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            color: transparent !important;
+        }
+
+        .notification-badge {
+            position: relative;
+        }
+
+            .notification-badge::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 8px;
+                height: 8px;
+                background: red;
+                border-radius: 50%;
+            }
+
+        .main-content-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        footer {
+            background: white;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            padding: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-cloud-upload-alt me-2"></i>DropSpace
+            </a>
+            <div class="ms-auto d-flex align-items-center">
+                <!-- Notifications -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-link text-dark notification-badge" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <h6 class="dropdown-header">Notifications</h6>
+                        <a class="dropdown-item" href="#">Your file has been uploaded</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-center" href="#">View all</a>
+                    </div>
+                </div>
+                <!-- Profile -->
+                <div class="dropdown">
+                    <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
+                        <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
+                        <span>Username</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a class="dropdown-item" href="/profile">Profile</a>
+                        <a class="dropdown-item" href="/settings">Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content-container">
+        @RenderBody()
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2024 - DropSpace · <a href="/privacy" class="text-decoration-none">Privacy</a> · <a href="#" class="text-decoration-none">Terms</a>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

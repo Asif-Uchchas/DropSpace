@@ -1,7 +1,7 @@
 ﻿@model List<IFormFile>
 @{
     ViewData["Title"] = "Register";
-    Layout = null;
+    Layout = "~/Views/Shared/_layout2.cshtml";
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -9,25 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
 
-<!-- Navbar -->
-<nav class="bg-indigo-600 py-4" style="height: 4.375rem;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between">
-            <div class="flex-shrink-0 text-white text-2xl font-semibold">
-                <a href="#">Your Logo</a>
-            </div>
-            <div class="hidden md:flex space-x-4">
-                <a href="#" class="text-white hover:text-indigo-200">Home</a>
-                <a href="#about" class="text-white hover:text-indigo-200">About</a>
-                <a href="#contact" class="text-white hover:text-indigo-200">Contact</a>
-            </div>
-        </div>
-    </div>
-</nav>
-
-<!-- Main Content -->
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-6 sm:px-11 py-8 sm:py-16">
-
     <div class="max-w-full sm:max-w-6xl mx-auto px-6 sm:px-11 py-8 sm:py-17">
         <div class="text-center">
             <h1 class="text-3xl sm:text-5xl font-bold text-gray-900 mb-6">Upload & Share Instantly</h1>
@@ -36,8 +18,59 @@
             </p>
         </div>
 
-        <div x-data="fileUpload()" class="mt-8 max-w-full sm:max-w-2xl mx-auto">
-            <form asp-controller="Upload" asp-action="ProcessUpload" method="post" enctype="multipart/form-data" class="relative">
+        <div x-data="{ ...fileUpload(), formValid: false, mobileVerified: false, showOTPFields: false, otpSubmitted: false }"
+             class="mt-8 max-w-full sm:max-w-2xl mx-auto">
+            <form id="uploadForm" asp-controller="Upload" asp-action="ProcessUpload" method="post"
+                  enctype="multipart/form-data" x-on:submit.prevent="validateAndSubmit" class="relative">
+
+                <!-- Personal Information Section -->
+                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">ব্যক্তিগত তথ্য</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium text-gray-700">নাম</label>
+                            <input type="text" id="name" name="name" required
+                                   x-on:input="validateForm"
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                   placeholder="আপনার নাম লিখুন">
+                        </div>
+                        <div>
+                            <label for="division" class="block text-sm font-medium text-gray-700">বিভাগ</label>
+                            <select id="division" name="division" required
+                                    x-on:change="validateForm"
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="" disabled selected>বিভাগ নির্বাচন করুন</option>
+                                <option value="1">ঢাকা</option>
+                                <option value="2">চট্টগ্রাম</option>
+                                <option value="3">সিলেট</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="district" class="block text-sm font-medium text-gray-700">জেলা</label>
+                            <select id="district" name="district" required
+                                    x-on:change="validateForm"
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="" disabled selected>জেলা নির্বাচন করুন</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="thana" class="block text-sm font-medium text-gray-700">থানা</label>
+                            <select id="thana" name="thana" required
+                                    x-on:change="validateForm"
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="" disabled selected>থানা নির্বাচন করুন</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="union" class="block text-sm font-medium text-gray-700">ইউনিয়ন</label>
+                            <select id="union" name="union" required
+                                    x-on:change="validateForm"
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="" disabled selected>ইউনিয়ন নির্বাচন করুন</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- File Upload Section -->
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 border-dashed border-gray-300 hover:border-indigo-400 transition"
@@ -82,14 +115,12 @@
                                     x-on:click="clearFiles">
                                 সব ফাইল মুছে ফেলুন
                             </button>
-                            <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                                ফাইল আপলোড করুন
-                            </button>
                         </div>
                     </div>
 
                     <input type="file"
                            multiple
+                           name="files"
                            class="hidden"
                            x-ref="fileInput"
                            x-on:change="handleFiles"
@@ -99,28 +130,67 @@
                 <!-- Mobile Number Section -->
                 <div class="mt-8">
                     <label for="showMobile" class="inline-flex items-center">
-                        <input type="checkbox" id="showMobile" x-model="showMobile" class="form-checkbox h-5 w-5 text-indigo-600">
-                        <span class="ml-2 text-gray-700">আপনার মোবাইল নম্বর ট্র্যাকিংয়ের জন্য যোগ করতে পারেন &nbsp;</span>
-                        <i class="fas fa-info-circle text-blue-500" x-on:mouseenter="showTooltip = true" x-on:mouseleave="showTooltip = false"></i>
+                        <input type="checkbox" id="showMobile" x-model="showMobile"
+                               x-on:change="validateForm"
+                               class="form-checkbox h-5 w-5 text-indigo-600">
+                        <span class="ml-2 text-gray-700">আপনার মোবাইল নম্বর ট্র্যাকিংয়ের জন্য যোগ করতে পারেন</span>
+                        <i class="fas fa-info-circle text-blue-500 ml-2"
+                           x-on:mouseenter="showTooltip = true"
+                           x-on:mouseleave="showTooltip = false"></i>
                     </label>
 
-                    <!-- Tooltip with Instructions -->
-                    <div x-show="showTooltip" class="absolute bg-gray-800 text-white text-sm p-4 rounded-lg shadow-lg max-w-sm mt-2 w-full z-10">
-                        <p><strong>গোপনীয় আপলোড:</strong> আপনি কোনো ব্যক্তিগত তথ্য ছাড়াই ফাইল আপলোড করতে পারেন।</p>
-                        <p><strong>ঐচ্ছিক মোবাইল নম্বর:</strong> ট্র্যাকিংয়ের জন্য মোবাইল নম্বর যোগ করা সম্পূর্ণ ঐচ্ছিক।</p>
+                    <!-- Tooltip -->
+                    <div x-show="showTooltip"
+                         class="absolute bg-gray-800 text-white text-sm p-4 rounded-lg shadow-lg max-w-sm mt-2 z-10">
+                        <p>গোপনীয় আপলোডে শুধুমাত্র গুরুত্বপূর্ণ তথ্য সংরক্ষিত হয়। মোবাইল নম্বর ফাইলটি ট্র্যাকিংয়ের জন্য রাখা হতে পারে।</p>
                     </div>
 
-                    <!-- Mobile Number Input -->
                     <div x-show="showMobile" class="mt-4">
-                        <label for="mobile" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
-                        <input type="tel" id="mobile" name="mobile" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="মোবাইল নম্বর লিখুন" required>
+                        <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
+                        <div class="flex items-center">
+                            <input type="text" id="mobileNumber" name="mobileNumber"
+                                   x-on:input="validateForm"
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                   placeholder="আপনার মোবাইল নম্বর লিখুন">
+                            <button type="button"
+                                    class="ml-2 text-blue-500 hover:underline w-40"
+                                    x-on:click="sendOTP"
+                                    x-bind:disabled="otpSubmitted">
+                                <span x-show="!otpSubmitted">ওটিপি পাঠান</span>
+                                <span x-show="otpSubmitted">ওটিপি পাঠানো হয়েছে</span>
+                            </button>
+                        </div>
+
+                        <!-- OTP Input Fields -->
+                        <div class="mt-4" x-show="showOTPFields">
+                            <label class="block text-sm font-medium text-gray-700">ওটিপি প্রবেশ করুন</label>
+                            <div class="flex items-center">
+                                <div class="flex space-x-2">
+                                    <template x-for="i in 6" :key="i">
+                                        <input type="text" maxlength="1"
+                                               class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field"
+                                               x-on:input="handleOTPInput($event, i)"
+                                               x-on:keydown="handleOTPKeydown($event, i)">
+                                    </template>
+                                </div>
+                                <button type="button"
+                                        class="ml-2 text-blue-500 hover:underline w-40"
+                                        x-on:click="verifyOTP"
+                                        x-bind:disabled="!otpComplete || mobileVerified">
+                                    <span x-show="!mobileVerified">ওটিপি যাচাই করুন</span>
+                                    <span x-show="mobileVerified" class="text-green-500">যাচাই সম্পন্ন</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
-                <div class="flex justify-center mt-6">
-                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                        ফাইল আপলোড করুন
+                <div class="mt-8 text-center">
+                    <button type="submit"
+                            class="w-full sm:w-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:bg-gray-400"
+                            x-bind:disabled="!formValid">
+                        সমস্ত তথ্য জমা দিন
                     </button>
                 </div>
             </form>
@@ -129,51 +199,211 @@
 </div>
 
 <script>
+    
     function fileUpload() {
         return {
             isDragging: false,
-            files: [],
             hasFiles: false,
-            isUploading: false,
-            progress: 0,
-            showMobile: false,  // Tracks whether the mobile number field is visible or not
-            showTooltip: false, // Controls the visibility of the tooltip
+            files: [],
+            showMobile: false,
+            showTooltip: false,
+            formValid: false,
+            mobileVerified: false,
+            showOTPFields: false,
+            otpSubmitted: false,
+            otpComplete: false,
+            otpValues: new Array(6).fill(''),
 
+            
+            formatFileSize(size) {
+                if (size < 1024) return size + ' bytes';
+                if (size < 1048576) return (size / 1024).toFixed(2) + ' KB';
+                return (size / 1048576).toFixed(2) + ' MB';
+            },
+
+            
+            handleFiles(event) {
+                this.files = Array.from(event.target.files);
+                this.hasFiles = true;
+                this.validateForm();
+            },
+
+            
             dropFiles(event) {
+                const dataTransfer = event.dataTransfer;
+                if (dataTransfer.files.length) {
+                    this.handleFiles({ target: { files: dataTransfer.files } });
+                }
                 this.isDragging = false;
-                this.addFiles(event.dataTransfer.files);
+                this.validateForm();
             },
 
-            handleFiles() {
-                this.addFiles(this.$refs.fileInput.files);
-            },
-
-            addFiles(fileList) {
-                Array.from(fileList).forEach(file => {
-                    this.files.push(file);
-                });
-                this.hasFiles = this.files.length > 0;
-            },
-
+            
             removeFile(index) {
                 this.files.splice(index, 1);
                 this.hasFiles = this.files.length > 0;
+                this.validateForm();
             },
 
+            
             clearFiles() {
                 this.files = [];
                 this.hasFiles = false;
+                this.validateForm();
             },
 
-            formatFileSize(size) {
-                const kb = 1024;
-                const mb = kb * 1024;
-                if (size >= mb) {
-                    return (size / mb).toFixed(2) + ' MB';
-                } else if (size >= kb) {
-                    return (size / kb).toFixed(2) + ' KB';
-                } else {
-                    return size + ' bytes';
+           
+            validateForm() {
+                const nameField = document.getElementById('name');
+                const divisionField = document.getElementById('division');
+                const districtField = document.getElementById('district');
+                const thanaField = document.getElementById('thana');
+                const unionField = document.getElementById('union');
+                const mobileField = document.getElementById('mobileNumber');
+
+                const basicFieldsValid =
+                    nameField.value.trim() !== '' &&
+                    divisionField.value !== '' &&
+                    districtField.value !== '' &&
+                    thanaField.value !== '' &&
+                    unionField.value !== '';
+
+                const filesValid = this.hasFiles && this.files.length > 0;
+
+                const mobileValid = !this.showMobile || (this.showMobile && this.mobileVerified);
+
+                this.formValid = basicFieldsValid && filesValid && mobileValid;
+            },
+
+            
+            async sendOTP() {
+                const mobileNumber = document.getElementById('mobileNumber').value;
+                if (!mobileNumber || mobileNumber.length !== 11) {
+                    alert('দয়া করে সঠিক মোবাইল নম্বর দিন');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/sendOTP', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ mobileNumber })
+                    });
+
+                    if (response.ok) {
+                        this.showOTPFields = true;
+                        this.otpSubmitted = true;
+                    } else {
+                        alert('ওটিপি পাঠানো সম্ভব হয়নি। দয়া করে আবার চেষ্টা করুন।');
+                    }
+                } catch (error) {
+                    console.error('Error sending OTP:', error);
+                    alert('ওটিপি পাঠানোর সময় একটি ত্রুটি ঘটেছে।');
+                }
+            },
+
+           
+            handleOTPInput(event, position) {
+                const value = event.target.value;
+                if (value.length <= 1 && /^\d*$/.test(value)) {
+                    this.otpValues[position - 1] = value;
+                    this.otpComplete = this.otpValues.every(v => v !== '');
+
+                    
+                    if (value && position < 6) {
+                        const nextInput = event.target.nextElementSibling;
+                        if (nextInput) nextInput.focus();
+                    }
+                }
+            },
+
+            
+            handleOTPKeydown(event, position) {
+                if (event.key === 'Backspace' && !event.target.value && position > 1) {
+                    const prevInput = event.target.previousElementSibling;
+                    if (prevInput) {
+                        prevInput.focus();
+                        this.otpValues[position - 2] = '';
+                    }
+                }
+            },
+
+            
+            async verifyOTP() {
+                const otp = this.otpValues.join('');
+                const mobileNumber = document.getElementById('mobileNumber').value;
+
+                try {
+                    const response = await fetch('/api/verifyOTP', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ mobileNumber, otp })
+                    });
+
+                    if (response.ok) {
+                        this.mobileVerified = true;
+                        this.validateForm();
+                    } else {
+                        alert('ভুল ওটিপি। দয়া করে আবার চেষ্টা করুন।');
+                    }
+                } catch (error) {
+                    console.error('Error verifying OTP:', error);
+                    alert('ওটিপি যাচাই করার সময় একটি ত্রুটি ঘটেছে।');
+                }
+            },
+
+            // Submit form
+            async validateAndSubmit() {
+                if (!this.formValid) {
+                    alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
+                    return;
+                }
+
+                const formData = new FormData();
+
+                // Add personal information
+                formData.append('name', document.getElementById('name').value);
+                formData.append('division', document.getElementById('division').value);
+                formData.append('district', document.getElementById('district').value);
+                formData.append('thana', document.getElementById('thana').value);
+                formData.append('union', document.getElementById('union').value);
+
+                // Add files
+                this.files.forEach((file, index) => {
+                    formData.append(`files[${index}]`, file);
+                });
+
+                // Add mobile number if verified
+                if (this.showMobile && this.mobileVerified) {
+                    formData.append('mobileNumber', document.getElementById('mobileNumber').value);
+                }
+
+                try {
+                    const response = await fetch('/Upload/ProcessUpload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.success) {
+                            alert('ফাইল সফলভাবে আপলোড হয়েছে।');
+                            window.location.href = result.redirectUrl;
+                        } else {
+                            alert(result.message || 'আপলোড ব্যর্থ হয়েছে।');
+                        }
+                    } else {
+                        alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                    alert('ফর্ম জমা দেওয়ার সময় একটি ত্রুটি ঘটেছে।');
                 }
             }
         };
