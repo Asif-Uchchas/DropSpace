@@ -269,3 +269,11 @@ __pycache__/
 /obj/Debug/net8.0/DropSpace.AssemblyInfo.cs
 /obj/Debug/net8.0/DropSpace.AssemblyInfoInputs.cache
 /obj/Debug/net8.0/DropSpace.GeneratedMSBuildEditorConfig.editorconfig
+/.vs/DropSpace/v17/.futdcache.v2
+/.vs/DropSpace/v17/DocumentLayout.backup.json
+/obj/Debug/net8.0/DropSpace.assets.cache
+/obj/DropSpace.csproj.nuget.dgspec.json
+/obj/DropSpace.csproj.nuget.g.props
+/obj/DropSpace.csproj.nuget.g.targets
+/obj/project.assets.json
+/obj/project.nuget.cache
