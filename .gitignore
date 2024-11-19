@@ -260,3 +260,12 @@ paket-files/
 __pycache__/
 *.pyc
 /PHQLeaveManagement.Web/wwwroot/pdf
+/.vs/DropSpace/FileContentIndex/c6de25ef-8f54-4884-9c98-e26896770e32.vsidx
+/.vs/DropSpace/v17/.suo
+/.vs/DropSpace/v17/DocumentLayout.json
+/.vs/ProjectEvaluation/dropspace.metadata.v9.bin
+/.vs/ProjectEvaluation/dropspace.projects.v9.bin
+/.vs/ProjectEvaluation/dropspace.strings.v9.bin
+/obj/Debug/net8.0/DropSpace.AssemblyInfo.cs
+/obj/Debug/net8.0/DropSpace.AssemblyInfoInputs.cache
+/obj/Debug/net8.0/DropSpace.GeneratedMSBuildEditorConfig.editorconfig
