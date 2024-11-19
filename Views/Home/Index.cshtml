@@ -20,7 +20,7 @@
 
         <div x-data="{ ...fileUpload(), formValid: false, mobileVerified: false, showOTPFields: false, otpSubmitted: false }"
              class="mt-8 max-w-full sm:max-w-2xl mx-auto">
-            <form id="uploadForm" asp-controller="Upload" asp-action="ProcessUpload" method="post"
+            <form id="uploadForm" asp-controller="Upload" asp-action="UploadData" method="post"
                   enctype="multipart/form-data" x-on:submit.prevent="validateAndSubmit" class="relative">
 
                 <!-- Personal Information Section -->
@@ -29,7 +29,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">নাম</label>
-                            <input type="text" id="name" name="name" required
+                            <input type="text" id="name" name="personsData.name" required
                                    x-on:input="validateForm"
                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                                    placeholder="আপনার নাম লিখুন">
@@ -51,6 +51,8 @@
                                     x-on:change="validateForm"
                                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="" disabled selected>জেলা নির্বাচন করুন</option>
+                                <option value="1">ঢাকা</option>
+                                <option value="2">গাজীপুর</option>
                             </select>
                         </div>
                         <div>
@@ -59,26 +61,38 @@
                                     x-on:change="validateForm"
                                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="" disabled selected>থানা নির্বাচন করুন</option>
+                                <option value="1">মিরপুর</option>
+                                <option value="2">গুলশান</option>
                             </select>
                         </div>
                         <div>
                             <label for="union" class="block text-sm font-medium text-gray-700">ইউনিয়ন</label>
-                            <select id="union" name="union" required
+                            <select id="union" name="personsData.unionId" required
                                     x-on:change="validateForm"
                                     class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="" disabled selected>ইউনিয়ন নির্বাচন করুন</option>
+                                <option value="1">ইউনিয়ন 1</option>
+                                <option value="2">ইউনিয়ন 2</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="village" class="block text-sm font-medium text-gray-700">গ্রাম</label>
+                            <select id="village" name="personsData.villageId" required
+                                    x-on:change="validateForm"
+                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="" disabled selected>গ্রাম নির্বাচন করুন</option>
+                                <option value="1">গ্রাম 1</option>
+                                <option value="2">গ্রাম 2</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- File Upload Section -->
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 border-dashed border-gray-300 hover:border-indigo-400 transition"
                      x-bind:class="{ 'border-indigo-600': isDragging }"
                      x-on:dragover.prevent="isDragging = true"
                      x-on:dragleave.prevent="isDragging = false"
                      x-on:drop.prevent="dropFiles($event)">
-
                     <!-- Upload Icon -->
                     <div class="text-center" x-show="!hasFiles">
                         <svg class="mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -90,7 +104,6 @@
                             ব্রাউজ করে ফাইল নির্বাচন করুন
                         </button>
                     </div>
-
                     <!-- File List -->
                     <div x-show="hasFiles" class="space-y-4">
                         <template x-for="(file, index) in files" :key="index">
@@ -109,7 +122,6 @@
                                 </button>
                             </div>
                         </template>
-
                         <div class="flex flex-col sm:flex-row justify-between sm:space-x-4 mt-4">
                             <button type="button" class="px-4 py-2 text-gray-700 hover:text-gray-900 sm:mb-0 mb-4"
                                     x-on:click="clearFiles">
@@ -117,14 +129,12 @@
                             </button>
                         </div>
                     </div>
-
                     <input type="file"
                            multiple
                            name="files"
                            class="hidden"
                            x-ref="fileInput"
-                           x-on:change="handleFiles"
-                           accept="*/*">
+                           x-on:change="handleFiles">
                 </div>
 
                 <!-- Mobile Number Section -->
@@ -185,6 +195,10 @@
                     </div>
                 </div>
 
+                <!-- Hidden inputs for location -->
+                <input type="hidden" name="personsData.latitude" id="latitude">
+                <input type="hidden" name="personsData.longitude" id="longitude">
+
                 <!-- Submit Button -->
                 <div class="mt-8 text-center">
                     <button type="submit"
@@ -199,7 +213,7 @@
 </div>
 
 <script>
-    
+
     function fileUpload() {
         return {
             isDragging: false,
@@ -214,21 +228,18 @@
             otpComplete: false,
             otpValues: new Array(6).fill(''),
 
-            
             formatFileSize(size) {
                 if (size < 1024) return size + ' bytes';
                 if (size < 1048576) return (size / 1024).toFixed(2) + ' KB';
                 return (size / 1048576).toFixed(2) + ' MB';
             },
 
-            
             handleFiles(event) {
                 this.files = Array.from(event.target.files);
                 this.hasFiles = true;
                 this.validateForm();
             },
 
-            
             dropFiles(event) {
                 const dataTransfer = event.dataTransfer;
                 if (dataTransfer.files.length) {
@@ -238,48 +249,51 @@
                 this.validateForm();
             },
 
-            
             removeFile(index) {
                 this.files.splice(index, 1);
                 this.hasFiles = this.files.length > 0;
                 this.validateForm();
             },
 
-            
             clearFiles() {
                 this.files = [];
                 this.hasFiles = false;
                 this.validateForm();
             },
 
-           
             validateForm() {
                 const nameField = document.getElementById('name');
                 const divisionField = document.getElementById('division');
                 const districtField = document.getElementById('district');
                 const thanaField = document.getElementById('thana');
                 const unionField = document.getElementById('union');
-                const mobileField = document.getElementById('mobileNumber');
+                const villageField = document.getElementById('village');
 
                 const basicFieldsValid =
                     nameField.value.trim() !== '' &&
                     divisionField.value !== '' &&
                     districtField.value !== '' &&
                     thanaField.value !== '' &&
-                    unionField.value !== '';
+                    unionField.value !== '' &&
+                    villageField.value !== '';
 
                 const filesValid = this.hasFiles && this.files.length > 0;
-
                 const mobileValid = !this.showMobile || (this.showMobile && this.mobileVerified);
 
                 this.formValid = basicFieldsValid && filesValid && mobileValid;
             },
 
-            
             async sendOTP() {
+                debugger
                 const mobileNumber = document.getElementById('mobileNumber').value;
-                if (!mobileNumber || mobileNumber.length !== 11) {
-                    alert('দয়া করে সঠিক মোবাইল নম্বর দিন');
+                if (!mobileNumber || !/^01[3-9]\d{8}$/.test(mobileNumber)) {
+                    await Swal.fire({
+                        title: 'Invalid Mobile Number',
+                        text: 'দয়া করে সঠিক মোবাইল নম্বর দিন (11 digits starting with 01)',
+                        icon: 'warning',
+                        confirmButtonText: 'ঠিক আছে',
+                        confirmButtonColor: '#3085d6'
+                    });
                     return;
                 }
 
@@ -296,23 +310,40 @@
                     if (response.ok) {
                         this.showOTPFields = true;
                         this.otpSubmitted = true;
+                        await Swal.fire({
+                            title: 'OTP Sent',
+                            text: 'ওটিপি আপনার মোবাইলে পাঠানো হয়েছে।',
+                            icon: 'success',
+                            confirmButtonText: 'ঠিক আছে',
+                            confirmButtonColor: '#3085d6'
+                        });
                     } else {
-                        alert('ওটিপি পাঠানো সম্ভব হয়নি। দয়া করে আবার চেষ্টা করুন।');
+                        await Swal.fire({
+                            title: 'Error',
+                            text: 'ওটিপি পাঠানো সম্ভব হয়নি। দয়া করে আবার চেষ্টা করুন।',
+                            icon: 'error',
+                            confirmButtonText: 'ঠিক আছে',
+                            confirmButtonColor: '#3085d6'
+                        });
                     }
                 } catch (error) {
                     console.error('Error sending OTP:', error);
-                    alert('ওটিপি পাঠানোর সময় একটি ত্রুটি ঘটেছে।');
+                    await Swal.fire({
+                        title: 'Error',
+                        text: 'ওটিপি পাঠানোর সময় একটি ত্রুটি ঘটেছে।',
+                        icon: 'error',
+                        confirmButtonText: 'ঠিক আছে',
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
             },
 
-           
             handleOTPInput(event, position) {
                 const value = event.target.value;
                 if (value.length <= 1 && /^\d*$/.test(value)) {
                     this.otpValues[position - 1] = value;
                     this.otpComplete = this.otpValues.every(v => v !== '');
 
-                    
                     if (value && position < 6) {
                         const nextInput = event.target.nextElementSibling;
                         if (nextInput) nextInput.focus();
@@ -320,7 +351,6 @@
                 }
             },
 
-            
             handleOTPKeydown(event, position) {
                 if (event.key === 'Backspace' && !event.target.value && position > 1) {
                     const prevInput = event.target.previousElementSibling;
@@ -331,7 +361,6 @@
                 }
             },
 
-            
             async verifyOTP() {
                 const otp = this.otpValues.join('');
                 const mobileNumber = document.getElementById('mobileNumber').value;
@@ -349,63 +378,128 @@
                     if (response.ok) {
                         this.mobileVerified = true;
                         this.validateForm();
+                        await Swal.fire({
+                            title: 'Success',
+                            text: 'মোবাইল নম্বর যাচাই সফল হয়েছে।',
+                            icon: 'success',
+                            confirmButtonText: 'ঠিক আছে',
+                            confirmButtonColor: '#3085d6'
+                        });
                     } else {
-                        alert('ভুল ওটিপি। দয়া করে আবার চেষ্টা করুন।');
+                        await Swal.fire({
+                            title: 'Error',
+                            text: 'ভুল ওটিপি। দয়া করে আবার চেষ্টা করুন।',
+                            icon: 'error',
+                            confirmButtonText: 'ঠিক আছে',
+                            confirmButtonColor: '#3085d6'
+                        });
                     }
                 } catch (error) {
                     console.error('Error verifying OTP:', error);
-                    alert('ওটিপি যাচাই করার সময় একটি ত্রুটি ঘটেছে।');
+                    await Swal.fire({
+                        title: 'Error',
+                        text: 'ওটিপি যাচাই করার সময় একটি ত্রুটি ঘটেছে।',
+                        icon: 'error',
+                        confirmButtonText: 'ঠিক আছে',
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
             },
 
-            // Submit form
             async validateAndSubmit() {
                 if (!this.formValid) {
-                    alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
+                    await Swal.fire({
+                        title: 'Incomplete Form',
+                        text: 'দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।',
+                        icon: 'warning',
+                        confirmButtonText: 'ঠিক আছে',
+                        confirmButtonColor: '#3085d6'
+                    });
                     return;
                 }
 
                 const formData = new FormData();
 
                 // Add personal information
-                formData.append('name', document.getElementById('name').value);
-                formData.append('division', document.getElementById('division').value);
-                formData.append('district', document.getElementById('district').value);
-                formData.append('thana', document.getElementById('thana').value);
-                formData.append('union', document.getElementById('union').value);
+                formData.append('personsData.name', document.getElementById('name').value);
+                formData.append('personsData.mobile', this.showMobile ? document.getElementById('mobileNumber').value : '');
+                formData.append('personsData.unionId', document.getElementById('union').value);
+                formData.append('personsData.villageId', document.getElementById('village').value);
+                formData.append('personsData.latitude', document.getElementById('latitude').value);
+                formData.append('personsData.longitude', document.getElementById('longitude').value);
 
                 // Add files
                 this.files.forEach((file, index) => {
-                    formData.append(`files[${index}]`, file);
+                    formData.append(`files`, file);
                 });
 
-                // Add mobile number if verified
-                if (this.showMobile && this.mobileVerified) {
-                    formData.append('mobileNumber', document.getElementById('mobileNumber').value);
-                }
-
                 try {
-                    const response = await fetch('/Upload/ProcessUpload', {
+                    const response = await fetch('/Upload/UploadData', {
                         method: 'POST',
                         body: formData
                     });
 
                     if (response.ok) {
                         const result = await response.json();
-                        if (result.success) {
-                            alert('ফাইল সফলভাবে আপলোড হয়েছে।');
+                        await Swal.fire({
+                            title: 'Success',
+                            text: result.message || 'ফাইল সফলভাবে আপলোড হয়েছে।',
+                            icon: 'success',
+                            confirmButtonText: 'ঠিক আছে',
+                            confirmButtonColor: '#3085d6'
+                        });
+
+                        if (result.warnings) {
+                            await Swal.fire({
+                                title: 'Warnings',
+                                text: result.warnings,
+                                icon: 'warning',
+                                confirmButtonText: 'ঠিক আছে',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+
+                        // Reset form
+                        this.clearFiles();
+                        document.getElementById('uploadForm').reset();
+                        this.showMobile = false;
+                        this.mobileVerified = false;
+                        this.showOTPFields = false;
+                        this.otpSubmitted = false;
+                        this.validateForm();
+
+                        if (result.redirectUrl) {
                             window.location.href = result.redirectUrl;
-                        } else {
-                            alert(result.message || 'আপলোড ব্যর্থ হয়েছে।');
                         }
                     } else {
-                        alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+                        const errorData = await response.json();
+                        await Swal.fire({
+                            title: 'Upload Failed',
+                            text: errorData.message || 'আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।',
+                            icon: 'error',
+                            confirmButtonText: 'ঠিক আছে',
+                            confirmButtonColor: '#3085d6'
+                        });
                     }
                 } catch (error) {
                     console.error('Error submitting form:', error);
-                    alert('ফর্ম জমা দেওয়ার সময় একটি ত্রুটি ঘটেছে।');
+                    await Swal.fire({
+                        title: 'Error',
+                        text: 'ফর্ম জমা দেওয়ার সময় একটি ত্রুটি ঘটেছে।',
+                        icon: 'error',
+                        confirmButtonText: 'ঠিক আছে',
+                        confirmButtonColor: '#3085d6'
+                    });
                 }
             }
         };
+    }
+
+    // Initialize location detection
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            document.getElementById('latitude').value = position.coords.latitude;
+            document.getElementById('longitude').value = position.coords.longitude;
+        });
     }
 </script>
