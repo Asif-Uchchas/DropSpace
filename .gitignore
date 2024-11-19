@@ -277,3 +277,4 @@ __pycache__/
 /obj/DropSpace.csproj.nuget.g.targets
 /obj/project.assets.json
 /obj/project.nuget.cache
+/.vs/DropSpace/DesignTimeBuild/.dtbcache.v2
