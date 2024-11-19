@@ -1,10 +1,7 @@
-/**
- * @license
- * Unobtrusive validation support library for jQuery and jQuery Validate
- * Copyright (c) .NET Foundation. All rights reserved.
- * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
- * @version v4.0.0
- */
+// Unobtrusive validation support library for jQuery and jQuery Validate
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+// @version v3.2.11
 
 /*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: false */
 /*global document: false, jQuery: false */
@@ -55,7 +52,7 @@
     function onError(error, inputElement) {  // 'this' is the form element
         var container = $(this).find("[data-valmsg-for='" + escapeAttributeValue(inputElement[0].name) + "']"),
             replaceAttrValue = container.attr("data-valmsg-replace"),
-            replace = replaceAttrValue ? $.parseJSON(replaceAttrValue) !== false : null;
+            replace = replaceAttrValue ? $.parseLostAndFound(replaceAttrValue) !== false : null;
 
         container.removeClass("field-validation-valid").addClass("field-validation-error");
         error.data("unobtrusiveContainer", container);
@@ -88,7 +85,7 @@
 
         if (container) {
             var replaceAttrValue = container.attr("data-valmsg-replace"),
-                replace = replaceAttrValue ? $.parseJSON(replaceAttrValue) : null;
+                replace = replaceAttrValue ? $.parseLostAndFound(replaceAttrValue) : null;
 
             container.addClass("field-validation-valid").removeClass("field-validation-error");
             error.removeData("unobtrusiveContainer");

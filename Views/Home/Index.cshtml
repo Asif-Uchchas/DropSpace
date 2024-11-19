@@ -24,69 +24,62 @@
                   enctype="multipart/form-data" x-on:submit.prevent="validateAndSubmit" class="relative">
 
                 <!-- Personal Information Section -->
-                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">ব্যক্তিগত তথ্য</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">নাম</label>
-                            <input type="text" id="name" name="personsData.name" required
-                                   x-on:input="validateForm"
-                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                                   placeholder="আপনার নাম লিখুন">
-                        </div>
-                        <div>
-                            <label for="division" class="block text-sm font-medium text-gray-700">বিভাগ</label>
-                            <select id="division" name="division" required
-                                    x-on:change="validateForm"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" disabled selected>বিভাগ নির্বাচন করুন</option>
-                                <option value="1">ঢাকা</option>
-                                <option value="2">চট্টগ্রাম</option>
-                                <option value="3">সিলেট</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="district" class="block text-sm font-medium text-gray-700">জেলা</label>
-                            <select id="district" name="district" required
-                                    x-on:change="validateForm"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" disabled selected>জেলা নির্বাচন করুন</option>
-                                <option value="1">ঢাকা</option>
-                                <option value="2">গাজীপুর</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="thana" class="block text-sm font-medium text-gray-700">থানা</label>
-                            <select id="thana" name="thana" required
-                                    x-on:change="validateForm"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" disabled selected>থানা নির্বাচন করুন</option>
-                                <option value="1">মিরপুর</option>
-                                <option value="2">গুলশান</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="union" class="block text-sm font-medium text-gray-700">ইউনিয়ন</label>
-                            <select id="union" name="personsData.unionId" required
-                                    x-on:change="validateForm"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" disabled selected>ইউনিয়ন নির্বাচন করুন</option>
-                                <option value="1">ইউনিয়ন 1</option>
-                                <option value="2">ইউনিয়ন 2</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="village" class="block text-sm font-medium text-gray-700">গ্রাম</label>
-                            <select id="village" name="personsData.villageId" required
-                                    x-on:change="validateForm"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" disabled selected>গ্রাম নির্বাচন করুন</option>
-                                <option value="1">গ্রাম 1</option>
-                                <option value="2">গ্রাম 2</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+<div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4">ব্যক্তিগত তথ্য</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">নাম</label>
+            <input type="text" id="name" name="personsData.name" required
+                   x-on:input="validateForm"
+                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                   placeholder="আপনার নাম লিখুন">
+        </div>
+        <div>
+            <label for="division" class="block text-sm font-medium text-gray-700">বিভাগ</label>
+            <select id="division" name="division" required
+                    x-on:change="loadDistricts(); validateForm()"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="" selected>বিভাগ নির্বাচন করুন</option>
+            </select>
+        </div>
+        <div>
+            <label for="district" class="block text-sm font-medium text-gray-700">জেলা</label>
+            <select id="district" name="district" required
+                    x-on:change="loadThanas(); validateForm()"
+                    x-bind:disabled="!divisions.length || !document.getElementById('division').value"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                <option value="" selected>জেলা নির্বাচন করুন</option>
+            </select>
+        </div>
+        <div>
+            <label for="thana" class="block text-sm font-medium text-gray-700">থানা</label>
+            <select id="thana" name="thana" required
+                    x-on:change="loadUnions(); validateForm()"
+                    x-bind:disabled="!districts.length || !document.getElementById('district').value"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                <option value="" selected>থানা নির্বাচন করুন</option>
+            </select>
+        </div>
+        <div>
+            <label for="union" class="block text-sm font-medium text-gray-700">ইউনিয়ন</label>
+            <select id="union" name="personsData.unionId" required
+                    x-on:change="loadVillages(); validateForm()"
+                    x-bind:disabled="!thanas.length || !document.getElementById('thana').value"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                <option value="" selected>ইউনিয়ন নির্বাচন করুন</option>
+            </select>
+        </div>
+        <div>
+            <label for="village" class="block text-sm font-medium text-gray-700">গ্রাম</label>
+            <select id="village" name="personsData.villageId" required
+                    x-on:change="validateForm()"
+                    x-bind:disabled="!unions.length || !document.getElementById('union').value"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                <option value="" selected>গ্রাম নির্বাচন করুন</option>
+            </select>
+        </div>
+    </div>
+</div>
 
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 border-dashed border-gray-300 hover:border-indigo-400 transition"
                      x-bind:class="{ 'border-indigo-600': isDragging }"
@@ -217,6 +210,10 @@
 </script>
 <script>
 
+    $(document).ready(function() {
+       alert("ready!");
+    });
+
     function fileUpload() {
         return {
             isDragging: false,
@@ -230,6 +227,173 @@
             otpSubmitted: false,
             otpComplete: false,
             otpValues: new Array(6).fill(''),
+            divisions: [],
+            districts: [],
+            thanas: [],
+            unions: [],
+            villages: [],
+
+            // Initialize locations on component load
+        async init() {
+            try {
+                console.log('Initializing...');
+                // Initialize dropdowns with loading state
+                const dropdowns = ['division', 'district', 'thana', 'union', 'village'];
+                dropdowns.forEach(id => {
+                    const dropdown = document.getElementById(id);
+                    if (dropdown) {
+                        dropdown.innerHTML = '<option value="">Loading...</option>';
+                    }
+                });
+
+                await this.loadDivisions();
+                this.setupEventListeners();
+                
+                // Initialize geolocation
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(position => {
+                        document.getElementById('latitude').value = position.coords.latitude;
+                        document.getElementById('longitude').value = position.coords.longitude;
+                    });
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+                await this.showError('ডাটা লোড করতে সমস্যা হচ্ছে');
+            }
+        },
+
+        async loadDivisions() {
+            try {
+                console.log('Loading divisions...');
+                console.log('API URL:', `${API_BASE_URL}/api/MasterData/GetDivisionByCountryId?cId=1`);
+                
+                const response = await fetch(`${API_BASE_URL}/api/MasterData/GetDivisionByCountryId?cId=1`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Divisions data received:', data);
+                
+                if (!Array.isArray(data)) {
+                    throw new Error('Invalid data format received');
+                }
+                
+                this.divisions = data.filter(div => div.isActive === "Active");
+                this.populateDropdown('division', this.divisions, 'divisionNameBn', 'id');
+                
+            } catch (error) {
+                console.error('Error loading divisions:', error);
+                const divisionDropdown = document.getElementById('division');
+                if (divisionDropdown) {
+                    divisionDropdown.innerHTML = '<option value="">বিভাগ নির্বাচন করুন</option>';
+                }
+                await this.showError('বিভাগের তথ্য লোড করতে সমস্যা হচ্ছে।');
+            }
+        },
+
+        async loadDistricts() {
+            const divisionId = document.getElementById('division').value;
+            if (!divisionId) return;
+            
+            try {
+                console.log('Loading districts for division:', divisionId);
+                const response = await fetch(`${API_BASE_URL}/api/MasterData/GetDistrictByDivisionId?dId=${divisionId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Districts data received:', data);
+                
+                this.districts = data.filter(dist => dist.isActive === "Active");
+                this.populateDropdown('district', this.districts, 'districtNameBn', 'id');
+                this.resetDependentDropdowns(['thana', 'union', 'village']);
+                
+            } catch (error) {
+                console.error('Error loading districts:', error);
+                await this.showError('জেলার তথ্য লোড করতে সমস্যা হচ্ছে।');
+            }
+        },
+
+        populateDropdown(elementId, data, nameField, valueField) {
+            console.log(`Populating ${elementId} dropdown with data:`, data);
+            
+            const dropdown = document.getElementById(elementId);
+            if (!dropdown) {
+                console.error(`Dropdown element not found: ${elementId}`);
+                return;
+            }
+
+            // Clear existing options
+            dropdown.innerHTML = '';
+
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = this.getDefaultOptionText(elementId);
+            dropdown.appendChild(defaultOption);
+
+            // Add data options
+            if (Array.isArray(data)) {
+                data.forEach(item => {
+                    if (item && item[valueField] !== undefined && item[nameField] !== undefined) {
+                        const option = document.createElement('option');
+                        option.value = item[valueField];
+                        option.textContent = item[nameField];
+                        dropdown.appendChild(option);
+                    }
+                });
+            }
+
+            dropdown.disabled = false;
+            this.validateForm();
+            
+            console.log(`${elementId} dropdown populated with ${dropdown.options.length - 1} options`);
+        },
+
+        getDefaultOptionText(elementId) {
+            const defaultTexts = {
+                'division': 'বিভাগ নির্বাচন করুন',
+                'district': 'জেলা নির্বাচন করুন',
+                'thana': 'থানা নির্বাচন করুন',
+                'union': 'ইউনিয়ন নির্বাচন করুন',
+                'village': 'গ্রাম নির্বাচন করুন'
+            };
+            return defaultTexts[elementId] || 'নির্বাচন করুন';
+        },
+
+        resetDependentDropdowns(dropdownIds) {
+            dropdownIds.forEach(id => {
+                const dropdown = document.getElementById(id);
+                if (dropdown) {
+                    dropdown.innerHTML = `<option value="">${this.getDefaultOptionText(id)}</option>`;
+                    dropdown.disabled = true;
+                }
+            });
+            this.validateForm();
+        },
+
+        setupEventListeners() {
+            const dropdowns = {
+                'division': this.loadDistricts.bind(this),
+                'district': this.loadThanas.bind(this),
+                'thana': this.loadUnions.bind(this),
+                'union': this.loadVillages.bind(this)
+            };
+
+            Object.entries(dropdowns).forEach(([id, handler]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', async (e) => {
+                        if (e.target.value) {
+                            console.log(`${id} changed to:`, e.target.value);
+                            await handler();
+                        }
+                    });
+                }
+            });
+        },
 
             formatFileSize(size) {
                 if (size < 1024) return size + ' bytes';
@@ -285,6 +449,9 @@
 
                 this.formValid = basicFieldsValid && filesValid && mobileValid;
             },
+
+
+
 
             async sendOTP() {
                 debugger
