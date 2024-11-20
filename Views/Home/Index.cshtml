@@ -26,35 +26,35 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">নাম</label>
-                            <input type="text" id="name" name="personsData.name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার নাম লিখুন">
+                            <input type="text" id="name" name="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার নাম লিখুন">
                         </div>
                         <div>
                             <label for="division" class="block text-sm font-medium text-gray-700">বিভাগ</label>
-                            <select id="division" name="personsData.divisionId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <select id="division" name="divisionId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="" selected>বিভাগ নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="district" class="block text-sm font-medium text-gray-700">জেলা</label>
-                            <select id="district" name="personsData.districtId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                            <select id="district" name="districtId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>জেলা নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="thana" class="block text-sm font-medium text-gray-700">থানা</label>
-                            <select id="thana" name="personsData.thanaId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                            <select id="thana" name="thanaId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>থানা নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="union" class="block text-sm font-medium text-gray-700">ইউনিয়ন</label>
-                            <select id="union" name="personsData.unionId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                            <select id="union" name="unionId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>ইউনিয়ন নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="village" class="block text-sm font-medium text-gray-700">গ্রাম</label>
-                            <select id="village" name="personsData.villageId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
+                            <select id="village" name="villageId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>গ্রাম নির্বাচন করুন</option>
                             </select>
                         </div>
@@ -87,7 +87,7 @@
     <div id="mobileSection" class="mt-4 hidden">
         <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
         <div class="flex items-center">
-            <input type="text" id="mobileNumber" name="mobileNumber" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার মোবাইল নম্বর লিখুন">
+            <input type="text" id="mobileNumber" name="mobile" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার মোবাইল নম্বর লিখুন">
             <button type="button" class="ml-1 text-blue-500 hover:underline w-50" id="sendOTPButton">
                 ওটিপি পাঠান
             </button>
@@ -116,8 +116,8 @@
 </div>
 
                 <!-- Hidden inputs for location -->
-                <input type="hidden" name="personsData.latitude" id="latitude">
-                <input type="hidden" name="personsData.longitude" id="longitude">
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
 
                 <!-- Submit Button -->
                 <div class="mt-8 text-center">
@@ -425,16 +425,24 @@ $(document).on('keydown', '#otpInputs input', function(e) {
                     data: formData,
                     processData: false,
                     contentType: false,
-                    success: function(result) {
+                    success: function (result) {
                         alert(result.message || 'ফাইল সফলভাবে আপলোড হয়েছে।');
                         $('#uploadForm')[0].reset();
                         $('#fileList').empty().addClass('hidden');
                         validateForm();
                     },
-                    error: function() {
+                    // error: function () {
+                    //     alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+                    // },
+                    error: function (xhr, status, error) {
+                        console.error(`Error: ${error}`);
+                        console.error(`Status: ${status}`);
+                        console.error(xhr.responseText);
                         alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
-                    }
+                    },
+
                 });
+
             } else {
                 alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
             }
