@@ -426,7 +426,13 @@ $(document).on('keydown', '#otpInputs input', function(e) {
                     processData: false,
                     contentType: false,
                     success: function (result) {
-                        alert(result.message || 'ফাইল সফলভাবে আপলোড হয়েছে।');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'ফাইল সফলভাবে আপলোড হয়েছে।',
+                            confirmButtonText: 'ঠিক আছে',
+                            confirmButtonColor: '#3085d6'
+                        });
                         $('#uploadForm')[0].reset();
                         $('#fileList').empty().addClass('hidden');
                         validateForm();
