@@ -1,5 +1,11 @@
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel options for large file uploads
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 2147483648; // Set to 2 GB (in bytes)
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
