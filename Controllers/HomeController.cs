@@ -15,6 +15,7 @@ namespace DropSpace.Controllers
 
         public IActionResult Index()
         {
+
             return View();
         }
         

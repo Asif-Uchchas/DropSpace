@@ -6,8 +6,7 @@
 @inject IConfiguration Configuration
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-6 sm:px-11 py-8 sm:py-16">
     <div class="max-w-full sm:max-w-6xl mx-auto px-6 sm:px-11 py-8 sm:py-17">
@@ -18,10 +17,8 @@
             </p>
         </div>
 
-        <div x-data="{ ...fileUpload(), formValid: false, mobileVerified: false, showOTPFields: false, otpSubmitted: false }"
-             class="mt-8 max-w-full sm:max-w-2xl mx-auto">
-            <form id="uploadForm"
-                  enctype="multipart/form-data" x-on:submit.prevent="validateAndSubmit" class="relative">
+        <div class="mt-8 max-w-full sm:max-w-2xl mx-auto">
+            <form id="uploadForm" enctype="multipart/form-data" class="relative">
 
                 <!-- Personal Information Section -->
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
@@ -29,164 +26,94 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">নাম</label>
-                            <input type="text" id="name" name="personsData.name" required
-                                   x-on:input="validateForm"
-                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                                   placeholder="আপনার নাম লিখুন">
+                            <input type="text" id="name" name="personsData.name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার নাম লিখুন">
                         </div>
                         <div>
                             <label for="division" class="block text-sm font-medium text-gray-700">বিভাগ</label>
-                            <select id="division" name="division" required
-                                    x-on:change="loadDistricts(); validateForm()"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <select id="division" name="personsData.divisionId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="" selected>বিভাগ নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="district" class="block text-sm font-medium text-gray-700">জেলা</label>
-                            <select id="district" name="district" required
-                                    x-on:change="loadThanas(); validateForm()"
-                                    x-bind:disabled="!divisions.length || !document.getElementById('division').value"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                            <select id="district" name="personsData.districtId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>জেলা নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="thana" class="block text-sm font-medium text-gray-700">থানা</label>
-                            <select id="thana" name="thana" required
-                                    x-on:change="loadUnions(); validateForm()"
-                                    x-bind:disabled="!districts.length || !document.getElementById('district').value"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                            <select id="thana" name="personsData.thanaId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>থানা নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="union" class="block text-sm font-medium text-gray-700">ইউনিয়ন</label>
-                            <select id="union" name="personsData.unionId" required
-                                    x-on:change="loadVillages(); validateForm()"
-                                    x-bind:disabled="!thanas.length || !document.getElementById('thana').value"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                            <select id="union" name="personsData.unionId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>ইউনিয়ন নির্বাচন করুন</option>
                             </select>
                         </div>
                         <div>
                             <label for="village" class="block text-sm font-medium text-gray-700">গ্রাম</label>
-                            <select id="village" name="personsData.villageId" required
-                                    x-on:change="validateForm()"
-                                    x-bind:disabled="!unions.length || !document.getElementById('union').value"
-                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-100">
+                            <select id="village" name="personsData.villageId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>গ্রাম নির্বাচন করুন</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 border-dashed border-gray-300 hover:border-indigo-400 transition"
-                     x-bind:class="{ 'border-indigo-600': isDragging }"
-                     x-on:dragover.prevent="isDragging = true"
-                     x-on:dragleave.prevent="isDragging = false"
-                     x-on:drop.prevent="dropFiles($event)">
-                    <!-- Upload Icon -->
-                    <div class="text-center" x-show="!hasFiles">
+                <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 border-dashed border-gray-300 hover:border-indigo-400 transition" id="fileUploadArea">
+                    <div class="text-center" id="fileUploadPrompt">
                         <svg class="mx-auto h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         <p class="mt-4 text-lg text-gray-600">আপনার ফাইলগুলো এখানে টেনে আনুন অথবা</p>
-                        <button type="button" class="mt-2 text-indigo-600 hover:text-indigo-700 font-medium"
-                                x-on:click="$refs.fileInput.click()">
+                        <button type="button" class="mt-2 text-indigo-600 hover:text-indigo-700 font-medium" id="browseFilesButton">
                             ব্রাউজ করে ফাইল নির্বাচন করুন
                         </button>
                     </div>
-                    <!-- File List -->
-                    <div x-show="hasFiles" class="space-y-4">
-                        <template x-for="(file, index) in files" :key="index">
-                            <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
-                                <div class="flex items-center space-x-4">
-                                    <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-900" x-text="file.name"></p>
-                                        <p class="text-sm text-gray-500" x-text="formatFileSize(file.size)"></p>
-                                    </div>
-                                </div>
-                                <button type="button" class="text-red-600 hover:text-red-800" x-on:click="removeFile(index)">
-                                    মুছে ফেলুন
-                                </button>
-                            </div>
-                        </template>
-                        <div class="flex flex-col sm:flex-row justify-between sm:space-x-4 mt-4">
-                            <button type="button" class="px-4 py-2 text-gray-700 hover:text-gray-900 sm:mb-0 mb-4"
-                                    x-on:click="clearFiles">
-                                সব ফাইল মুছে ফেলুন
-                            </button>
-                        </div>
+                    <div id="fileList" class="space-y-4 hidden">
+                        <!-- File list will be populated here -->
                     </div>
-                    <input type="file"
-                           multiple
-                           name="files"
-                           class="hidden"
-                           x-ref="fileInput"
-                           x-on:change="handleFiles">
+                    <input type="file" multiple name="files" id="fileInput" class="hidden">
                 </div>
 
                 <!-- Mobile Number Section -->
-                <div class="mt-8">
-                    <label for="showMobile" class="inline-flex items-center">
-                        <input type="checkbox" id="showMobile" x-model="showMobile"
-                               x-on:change="validateForm"
-                               class="form-checkbox h-5 w-5 text-indigo-600">
-                        <span class="ml-2 text-gray-700">আপনার মোবাইল নম্বর ট্র্যাকিংয়ের জন্য যোগ করতে পারেন</span>
-                        <i class="fas fa-info-circle text-blue-500 ml-2"
-                           x-on:mouseenter="showTooltip = true"
-                           x-on:mouseleave="showTooltip = false"></i>
-                    </label>
+<div class="mt-8">
+    <label for="showMobile" class="inline-flex items-center">
+        <input type="checkbox" id="showMobile" class="form-checkbox h-5 w-5 text-indigo-600">
+        <span class="ml-2 text-gray-700">আপনার মোবাইল নম্বর ট্র্যাকিংয়ের জন্য যোগ করতে পারেন</span>
+    </label>
 
-                    <!-- Tooltip -->
-                    <div x-show="showTooltip"
-                         class="absolute bg-gray-800 text-white text-sm p-4 rounded-lg shadow-lg max-w-sm mt-2 z-10">
-                        <p>গোপনীয় আপলোডে শুধুমাত্র গুরুত্বপূর্ণ তথ্য সংরক্ষিত হয়। মোবাইল নম্বর ফাইলটি ট্র্যাকিংয়ের জন্য রাখা হতে পারে।</p>
-                    </div>
-
-                    <div x-show="showMobile" class="mt-4">
-                        <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
-                        <div class="flex items-center">
-                            <input type="text" id="mobileNumber" name="mobileNumber"
-                                   x-on:input="validateForm"
-                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-                                   placeholder="আপনার মোবাইল নম্বর লিখুন">
-                            <button type="button"
-                                    class="ml-2 text-blue-500 hover:underline w-40"
-                                    x-on:click="sendOTP"
-                                    x-bind:disabled="otpSubmitted">
-                                <span x-show="!otpSubmitted">ওটিপি পাঠান</span>
-                                <span x-show="otpSubmitted">ওটিপি পাঠানো হয়েছে</span>
-                            </button>
-                        </div>
-
-                        <!-- OTP Input Fields -->
-                        <div class="mt-4" x-show="showOTPFields">
-                            <label class="block text-sm font-medium text-gray-700">ওটিপি প্রবেশ করুন</label>
-                            <div class="flex items-center">
-                                <div class="flex space-x-2">
-                                    <template x-for="i in 6" :key="i">
-                                        <input type="text" maxlength="1"
-                                               class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field"
-                                               x-on:input="handleOTPInput($event, i)"
-                                               x-on:keydown="handleOTPKeydown($event, i)">
-                                    </template>
-                                </div>
-                                <button type="button"
-                                        class="ml-2 text-blue-500 hover:underline w-40"
-                                        x-on:click="verifyOTP"
-                                        x-bind:disabled="!otpComplete || mobileVerified">
-                                    <span x-show="!mobileVerified">ওটিপি যাচাই করুন</span>
-                                    <span x-show="mobileVerified" class="text-green-500">যাচাই সম্পন্ন</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <div id="mobileSection" class="mt-4 hidden">
+        <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
+        <div class="flex items-center">
+            <input type="text" id="mobileNumber" name="mobileNumber" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার মোবাইল নম্বর লিখুন">
+            <button type="button" class="ml-1 text-blue-500 hover:underline w-50" id="sendOTPButton">
+                ওটিপি পাঠান
+            </button>
+        </div>
+        <div id="otpSection" class="mt-4 hidden">
+            <label class="block text-sm font-medium text-gray-700">ওটিপি প্রবেশ করুন</label>
+            <div class="flex items-center">
+                <div class="flex space-x-2" id="otpInputs">
+                    <!-- OTP Input Fields -->
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field" id="otp1">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field" id="otp2">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field" id="otp3">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field" id="otp4">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field" id="otp5">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center border border-gray-300 rounded-lg otp-field" id="otp6">
                 </div>
+                <button type="button" class="ml-2 text-blue-500 hover:underline" id="verifyOTPButton">
+                    ওটিপি যাচাই করুন
+                </button>
+                <button type="button" class="ml-2 text-blue-500 hover:underline hidden" id="verifyOTPButtonSuccess">
+                    ওটিপি যাচাই সফল হয়েছে।
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Hidden inputs for location -->
                 <input type="hidden" name="personsData.latitude" id="latitude">
@@ -194,9 +121,7 @@
 
                 <!-- Submit Button -->
                 <div class="mt-8 text-center">
-                    <button type="submit"
-                            class="w-full sm:w-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:bg-gray-400"
-                            x-bind:disabled="!formValid">
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200" id="submitButton" disabled>
                         সমস্ত তথ্য জমা দিন
                     </button>
                 </div>
@@ -205,478 +130,314 @@
     </div>
 </div>
 
-<script src="~/lib/jquery/dist/jquery.js"></script>
-<script>
-    const API_BASE_URL = '@Configuration["API:baseUrl"]';
-</script>
-<script>
-    $(document).ready(function () {
-        loadDivisions();
-    })
-    function loadDivisions() {
-        try {
-            console.log('Loading divisions...');
-            console.log('API URL:', `${API_BASE_URL}/api/MasterData/GetDivisionByCountryId?cId=1`);
-
-            const response = await fetch(`${API_BASE_URL}/api/MasterData/GetDivisionByCountryId?cId=1`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+@section Scripts{
+    <script>
+        const API_BASE_URL = '@Configuration["API:baseUrl"]';
+        
+        $(document).ready(function () {
+            // Initialize location detection
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    $('#latitude').val(position.coords.latitude);
+                    $('#longitude').val(position.coords.longitude);
+                });
             }
 
-            const data = await response.json();
-            console.log('Divisions data received:', data);
+            loadDivisions();
 
-            if (!Array.isArray(data)) {
-                throw new Error('Invalid data format received');
-            }
+            // Event listeners
+            $('#division').change(loadDistricts);
+            $('#district').change(loadThanas);
+            $('#thana').change(loadUnions);
+            $('#union').change(loadVillages);
+            $('#fileInput'). change(handleFiles);
+            $('#browseFilesButton').click(function() {
+                $('#fileInput').click();
+            });
+            $('#showMobile').change(function() {
+                $('#mobileSection').toggle(this.checked);
+                validateForm();
+            });
+            $('#sendOTPButton').click(sendOTP);
+            $('#verifyOTPButton').click(verifyOTP);
+            $('#uploadForm').submit(validateAndSubmit);
+        });
 
-            this.divisions = data.filter(div => div.isActive === "Active");
-            this.populateDropdown('division', this.divisions, 'divisionNameBn', 'id');
 
-        } catch (error) {
-            alert()
-            console.error('Error loading divisions:', error);
-            const divisionDropdown = document.getElementById('division');
-            if (divisionDropdown) {
-                divisionDropdown.innerHTML = '<option value="">বিভাগ নির্বাচন করুন</option>';
-            }
-            await this.showError('বিভাগের তথ্য লোড করতে সমস্যা হচ্ছে।');
-        }
-    }
-</script>
-<script>
-
-    function fileUpload() {
-        return {
-            isDragging: false,
-            hasFiles: false,
-            files: [],
-            showMobile: false,
-            showTooltip: false,
-            formValid: false,
-            mobileVerified: false,
-            showOTPFields: false,
-            otpSubmitted: false,
-            otpComplete: false,
-            otpValues: new Array(6).fill(''),
-            divisions: [],
-            districts: [],
-            thanas: [],
-            unions: [],
-            villages: [],
-
-            // Initialize locations on component load
-            async init() {
-                try {
-                    console.log('Initializing...');
-                    // Initialize dropdowns with loading state
-                    const dropdowns = ['division', 'district', 'thana', 'union', 'village'];
-                    dropdowns.forEach(id => {
-                        const dropdown = document.getElementById(id);
-                        if (dropdown) {
-                            dropdown.innerHTML = '<option value="">Loading...</option>';
-                        }
-                    });
-
-                    await this.loadDivisions();
-                    this.setupEventListeners();
-
-                    // Initialize geolocation
-                    if (navigator.geolocation) {
-                        navigator.geolocation.getCurrentPosition(position => {
-                            document.getElementById('latitude').value = position.coords.latitude;
-                            document.getElementById('longitude').value = position.coords.longitude;
-                        });
-                    }
-                } catch (error) {
-                    console.error('Initialization error:', error);
-                    await this.showError('ডাটা লোড করতে সমস্যা হচ্ছে');
+        function loadDivisions() {
+            $.ajax({
+                url: `${API_BASE_URL}/api/MasterData/GetDivisionByCountryId?cId=1`,
+                type: 'POST',
+                success: function (data) {
+                    populateDropdown('#division', data, 'divisionNameBn', 'id');
+                    resetDependentDropdowns(['#district', '#thana', '#union', '#village']);
+                },
+                error: function () {
+                    alert('Error loading divisions.');
                 }
-            },
+            });
+        }
+
+        function loadDistricts() {
+            const divisionId = $('#division').val();
+            if (!divisionId) return;
+
+            $.ajax({
+                url: `${API_BASE_URL}/api/MasterData/GetDistrictByDivisionId?dId=${divisionId}`,
+                type: 'POST',
+                success: function (data) {
+                    populateDropdown('#district', data, 'districtNameBn', 'id');
+                    resetDependentDropdowns(['#thana', '#union', '#village']);
+                },
+                error: function () {
+                    alert('Error loading districts.');
+                }
+            });
+        }
+
+        function loadThanas() {
+            const districtId = $('#district').val();
+            if (!districtId) return;
+
+            $.ajax({
+                url: `${API_BASE_URL}/api/MasterData/GetThanaByDistrictId?dId=${districtId}`,
+                type: 'POST',
+                success: function (data) {
+                    populateDropdown('#thana', data, 'thanaNameBn', 'id');
+                    resetDependentDropdowns(['#union', '#village']);
+                },
+                error: function () {
+                    alert('Error loading thanas.');
+                }
+            });
+        }
+
+        function loadUnions() {
+            const thanaId = $('#thana').val();
+            if (!thanaId) return;
+
+            $.ajax({
+                url: `${API_BASE_URL}/api/MasterData/GetUnionWardsByThanaId?tId=${thanaId}`,
+                type: 'POST',
+                success: function (data) {
+                    populateDropdown('#union', data, 'unionNameBn', 'id');
+                    resetDependentDropdowns(['#village']);
+                },
+                error: function () {
+                    alert('Error loading unions.');
+                }
+            });
+        }
+
+        function loadVillages() {
+            const unionId = $('#union').val();
+            if (!unionId) return;
+
+            $.ajax({
+                url: `${API_BASE_URL}/api/MasterData/GetAllVillageByUnionId?uId=${unionId}`,
+                type: 'POST',
+                success: function (data) {
+                    populateDropdown('#village', data, 'villageNameBn', 'id');
+                },
+                error: function () {
+                    alert('Error loading villages.');
+                }
+            });
+        }
+
+        function populateDropdown(selector, data, nameField, valueField) {
+            const dropdown = $(selector);
+            dropdown.empty().append('<option value="">নির্বাচন করুন</option>');
 
             
-
-            async loadDistricts() {
-                const divisionId = document.getElementById('division').value;
-                if (!divisionId) return;
-
-                try {
-                    console.log('Loading districts for division:', divisionId);
-                    const response = await fetch(`${API_BASE_URL}/api/MasterData/GetDistrictByDivisionId?dId=${divisionId}`);
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    console.log('Districts data received:', data);
-
-                    this.districts = data.filter(dist => dist.isActive === "Active");
-                    this.populateDropdown('district', this.districts, 'districtNameBn', 'id');
-                    this.resetDependentDropdowns(['thana', 'union', 'village']);
-
-                } catch (error) {
-                    console.error('Error loading districts:', error);
-                    await this.showError('জেলার তথ্য লোড করতে সমস্যা হচ্ছে।');
-                }
-            },
-
-            populateDropdown(elementId, data, nameField, valueField) {
-                console.log(`Populating ${elementId} dropdown with data:`, data);
-
-                const dropdown = document.getElementById(elementId);
-                if (!dropdown) {
-                    console.error(`Dropdown element not found: ${elementId}`);
-                    return;
-                }
-
-                // Clear existing options
-                dropdown.innerHTML = '';
-
-                // Add default option
-                const defaultOption = document.createElement('option');
-                defaultOption.value = '';
-                defaultOption.textContent = this.getDefaultOptionText(elementId);
-                dropdown.appendChild(defaultOption);
-
-                // Add data options
-                if (Array.isArray(data)) {
-                    data.forEach(item => {
-                        if (item && item[valueField] !== undefined && item[nameField] !== undefined) {
-                            const option = document.createElement('option');
-                            option.value = item[valueField];
-                            option.textContent = item[nameField];
-                            dropdown.appendChild(option);
-                        }
-                    });
-                }
-
-                dropdown.disabled = false;
-                this.validateForm();
-
-                console.log(`${elementId} dropdown populated with ${dropdown.options.length - 1} options`);
-            },
-
-            getDefaultOptionText(elementId) {
-                const defaultTexts = {
-                    'division': 'বিভাগ নির্বাচন করুন',
-                    'district': 'জেলা নির্বাচন করুন',
-                    'thana': 'থানা নির্বাচন করুন',
-                    'union': 'ইউনিয়ন নির্বাচন করুন',
-                    'village': 'গ্রাম নির্বাচন করুন'
-                };
-                return defaultTexts[elementId] || 'নির্বাচন করুন';
-            },
-
-            resetDependentDropdowns(dropdownIds) {
-                dropdownIds.forEach(id => {
-                    const dropdown = document.getElementById(id);
-                    if (dropdown) {
-                        dropdown.innerHTML = `<option value="">${this.getDefaultOptionText(id)}</option>`;
-                        dropdown.disabled = true;
-                    }
+            if (Array.isArray(data) && data.length > 0) {
+                $.each(data, function (i, item) {
+                    dropdown.append(`<option value="${item[valueField]}">${item[nameField]}</option>`);
                 });
-                this.validateForm();
-            },
-
-            setupEventListeners() {
-                const dropdowns = {
-                    'division': this.loadDistricts.bind(this),
-                    'district': this.loadThanas.bind(this),
-                    'thana': this.loadUnions.bind(this),
-                    'union': this.loadVillages.bind(this)
-                };
-
-                Object.entries(dropdowns).forEach(([id, handler]) => {
-                    const element = document.getElementById(id);
-                    if (element) {
-                        element.addEventListener('change', async (e) => {
-                            if (e.target.value) {
-                                console.log(`${id} changed to:`, e.target.value);
-                                await handler();
-                            }
-                        });
-                    }
-                });
-            },
-
-            formatFileSize(size) {
-                if (size < 1024) return size + ' bytes';
-                if (size < 1048576) return (size / 1024).toFixed(2) + ' KB';
-                return (size / 1048576).toFixed(2) + ' MB';
-            },
-
-            handleFiles(event) {
-                this.files = Array.from(event.target.files);
-                this.hasFiles = true;
-                this.validateForm();
-            },
-
-            dropFiles(event) {
-                const dataTransfer = event.dataTransfer;
-                if (dataTransfer.files.length) {
-                    this.handleFiles({ target: { files: dataTransfer.files } });
-                }
-                this.isDragging = false;
-                this.validateForm();
-            },
-
-            removeFile(index) {
-                this.files.splice(index, 1);
-                this.hasFiles = this.files.length > 0;
-                this.validateForm();
-            },
-
-            clearFiles() {
-                this.files = [];
-                this.hasFiles = false;
-                this.validateForm();
-            },
-
-            validateForm() {
-                const nameField = document.getElementById('name');
-                const divisionField = document.getElementById('division');
-                const districtField = document.getElementById('district');
-                const thanaField = document.getElementById('thana');
-                const unionField = document.getElementById('union');
-                const villageField = document.getElementById('village');
-
-                const basicFieldsValid =
-                    nameField.value.trim() !== '' &&
-                    divisionField.value !== '' &&
-                    districtField.value !== '' &&
-                    thanaField.value !== '' &&
-                    unionField.value !== '' &&
-                    villageField.value !== '';
-
-                const filesValid = this.hasFiles && this.files.length > 0;
-                const mobileValid = !this.showMobile || (this.showMobile && this.mobileVerified);
-
-                this.formValid = basicFieldsValid && filesValid && mobileValid;
-            },
-
-
-
-
-            async sendOTP() {
-                debugger
-                const mobileNumber = document.getElementById('mobileNumber').value;
-                if (!mobileNumber || !/^01[3-9]\d{8}$/.test(mobileNumber)) {
-                    await Swal.fire({
-                        title: 'Invalid Mobile Number',
-                        text: 'দয়া করে সঠিক মোবাইল নম্বর দিন (11 digits starting with 01)',
-                        icon: 'warning',
-                        confirmButtonText: 'ঠিক আছে',
-                        confirmButtonColor: '#3085d6'
-                    });
-                    return;
-                }
-
-                try {
-                    const response = await fetch('/api/sendOTP', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify({ mobileNumber })
-                    });
-
-                    if (response.ok) {
-                        this.showOTPFields = true;
-                        this.otpSubmitted = true;
-                        await Swal.fire({
-                            title: 'OTP Sent',
-                            text: 'ওটিপি আপনার মোবাইলে পাঠানো হয়েছে।',
-                            icon: 'success',
-                            confirmButtonText: 'ঠিক আছে',
-                            confirmButtonColor: '#3085d6'
-                        });
-                    } else {
-                        await Swal.fire({
-                            title: 'Error',
-                            text: 'ওটিপি পাঠানো সম্ভব হয়নি। দয়া করে আবার চেষ্টা করুন।',
-                            icon: 'error',
-                            confirmButtonText: 'ঠিক আছে',
-                            confirmButtonColor: '#3085d6'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error sending OTP:', error);
-                    await Swal.fire({
-                        title: 'Error',
-                        text: 'ওটিপি পাঠানোর সময় একটি ত্রুটি ঘটেছে।',
-                        icon: 'error',
-                        confirmButtonText: 'ঠিক আছে',
-                        confirmButtonColor: '#3085d6'
-                    });
-                }
-            },
-
-            handleOTPInput(event, position) {
-                const value = event.target.value;
-                if (value.length <= 1 && /^\d*$/.test(value)) {
-                    this.otpValues[position - 1] = value;
-                    this.otpComplete = this.otpValues.every(v => v !== '');
-
-                    if (value && position < 6) {
-                        const nextInput = event.target.nextElementSibling;
-                        if (nextInput) nextInput.focus();
-                    }
-                }
-            },
-
-            handleOTPKeydown(event, position) {
-                if (event.key === 'Backspace' && !event.target.value && position > 1) {
-                    const prevInput = event.target.previousElementSibling;
-                    if (prevInput) {
-                        prevInput.focus();
-                        this.otpValues[position - 2] = '';
-                    }
-                }
-            },
-
-            async verifyOTP() {
-                const otp = this.otpValues.join('');
-                const mobileNumber = document.getElementById('mobileNumber').value;
-
-                try {
-                    const response = await fetch('/api/verifyOTP', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify({ mobileNumber, otp })
-                    });
-
-                    if (response.ok) {
-                        this.mobileVerified = true;
-                        this.validateForm();
-                        await Swal.fire({
-                            title: 'Success',
-                            text: 'মোবাইল নম্বর যাচাই সফল হয়েছে।',
-                            icon: 'success',
-                            confirmButtonText: 'ঠিক আছে',
-                            confirmButtonColor: '#3085d6'
-                        });
-                    } else {
-                        await Swal.fire({
-                            title: 'Error',
-                            text: 'ভুল ওটিপি। দয়া করে আবার চেষ্টা করুন।',
-                            icon: 'error',
-                            confirmButtonText: 'ঠিক আছে',
-                            confirmButtonColor: '#3085d6'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error verifying OTP:', error);
-                    await Swal.fire({
-                        title: 'Error',
-                        text: 'ওটিপি যাচাই করার সময় একটি ত্রুটি ঘটেছে।',
-                        icon: 'error',
-                        confirmButtonText: 'ঠিক আছে',
-                        confirmButtonColor: '#3085d6'
-                    });
-                }
-            },
-
-            async validateAndSubmit() {
-                if (!this.formValid) {
-                    await Swal.fire({
-                        title: 'Incomplete Form',
-                        text: 'দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।',
-                        icon: 'warning',
-                        confirmButtonText: 'ঠিক আছে',
-                        confirmButtonColor: '#3085d6'
-                    });
-                    return;
-                }
-
-                const formData = new FormData();
-
-                // Add personal information
-                formData.append('personsData.name', document.getElementById('name').value);
-                formData.append('personsData.mobile', this.showMobile ? document.getElementById('mobileNumber').value : '');
-                formData.append('personsData.unionId', document.getElementById('union').value);
-                formData.append('personsData.villageId', document.getElementById('village').value);
-                formData.append('personsData.latitude', document.getElementById('latitude').value);
-                formData.append('personsData.longitude', document.getElementById('longitude').value);
-
-                // Add files
-                this.files.forEach((file, index) => {
-                    formData.append(`files`, file);
-                });
-
-                try {
-                    // const response = await fetch('/Upload/UploadData', {
-                    //     method: 'POST',
-                    //     body: formData
-                    // });
-                    const response = await fetch(`${API_BASE_URL}/api/FileUpload/UploadData`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    if (response.ok) {
-                        const result = await response.json();
-                        await Swal.fire({
-                            title: 'Success',
-                            text: result.message || 'ফাইল সফলভাবে আপলোড হয়েছে।',
-                            icon: 'success',
-                            confirmButtonText: 'ঠিক আছে',
-                            confirmButtonColor: '#3085d6'
-                        });
-
-                        if (result.warnings) {
-                            await Swal.fire({
-                                title: 'Warnings',
-                                text: result.warnings,
-                                icon: 'warning',
-                                confirmButtonText: 'ঠিক আছে',
-                                confirmButtonColor: '#3085d6'
-                            });
-                        }
-
-                        // Reset form
-                        this.clearFiles();
-                        document.getElementById('uploadForm').reset();
-                        this.showMobile = false;
-                        this.mobileVerified = false;
-                        this.showOTPFields = false;
-                        this.otpSubmitted = false;
-                        this.validateForm();
-
-                        if (result.redirectUrl) {
-                            window.location.href = result.redirectUrl;
-                        }
-                    } else {
-                        const errorData = await response.json();
-                        await Swal.fire({
-                            title: 'Upload Failed',
-                            text: errorData.message || 'আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।',
-                            icon: 'error',
-                            confirmButtonText: 'ঠিক আছে',
-                            confirmButtonColor: '#3085d6'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error submitting form:', error);
-                    await Swal.fire({
-                        title: 'Error',
-                        text: 'ফর্ম জমা দেওয়ার সময় একটি ত্রুটি ঘটেছে।',
-                        icon: 'error',
-                        confirmButtonText: 'ঠিক আছে',
-                        confirmButtonColor: '#3085d6'
-                    });
-                }
+                dropdown.prop('disabled', false);
+            } else {
+                dropdown.prop('disabled', true);
             }
-        };
+
+            validateForm();
+        }
+
+        function resetDependentDropdowns(dropdownIds) {
+            $.each(dropdownIds, function (index, id) {
+                $(id).empty()
+                    .append('<option value="">নির্বাচন করুন</option>')
+                    .prop('disabled', true);
+            });
+            validateForm();
+        }
+
+        
+
+        function handleFiles(event) {
+            const files = event.target.files;
+            $('#fileList').empty().removeClass('hidden');
+            $.each(files, function(index, file) {
+                $('#fileList').append(`
+                    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <p class="text-sm font-medium text-gray-900">${file.name}</p>
+                            <p class="text-sm text-gray-500">${(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                        <button type="button" class="text-red-600 hover:text-red-800" onclick="removeFile(this)">মুছে ফেলুন</button>
+                    </div>
+                `);
+            });
+            validateForm();
+        }
+
+        function removeFile(button) {
+            $(button).closest('.flex').remove();
+            validateForm();
+        }
+
+        function validateForm() {
+            const isValid = $('#name').val() && $('#division').val() && $('#district').val() && $('#thana').val() && $('#union').val() && $('#village').val() && $('#fileList .flex').length > 0;
+            $('#submitButton').prop('disabled', !isValid);
+        }
+
+        function sendOTP() {
+    const mobileNumber = $('#mobileNumber').val();
+    if (!/^01[3-9]\d{8}$/.test(mobileNumber)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Invalid Mobile Number',
+            text: 'দয়া করে সঠিক মোবাইল নম্বর দিন (11 digits starting with 01)',
+            confirmButtonText: 'ঠিক আছে',
+            confirmButtonColor: '#3085d6'
+        });
+        return;
     }
 
-    // Initialize location detection
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            document.getElementById('latitude').value = position.coords.latitude;
-            document.getElementById('longitude').value = position.coords.longitude;
-        });
+    $.ajax({
+        url: '/api/sendOTP',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ mobileNumber }),
+        success: function() {
+            $('#otpSection').removeClass('hidden');
+            Swal.fire({
+                icon: 'success',
+                title: 'OTP Sent',
+                text: 'ওটিপি আপনার মোবাইলে পাঠানো হয়েছে।',
+                confirmButtonText: 'ঠিক আছে',
+                confirmButtonColor: '#3085d6'
+            });
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'ওটিপি পাঠানো সম্ভব হয়নি। দয়া করে আবার চেষ্টা করুন।',
+                confirmButtonText: 'ঠিক আছে',
+                confirmButtonColor: '#3085d6'
+            });
+        }
+    });
+}
+
+function verifyOTP() {
+    const otp = $('#otpInputs input').map(function() { return $(this).val(); }).get().join('');
+    const mobileNumber = $('#mobileNumber').val();
+
+    $.ajax({
+        url: '/api/verifyOTP',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ mobileNumber, otp }),
+        success: function() {
+             $('#verifyOTPButton').addClass('hidden');
+             $('#verifyOTPButton').removeClass('hidden');
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'মোবাইল নম্বর যাচাই সফল হয়েছে।',
+                confirmButtonText: 'ঠিক আছে',
+                confirmButtonColor: '#3085d6'
+            });
+            validateForm();
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'ভুল ওটিপি। দয়া করে আবার চেষ্টা করুন।',
+                confirmButtonText: 'ঠিক আছে',
+                confirmButtonColor: '#3085d6'
+            });
+        }
+    });
+}
+
+// Handle paste and backspace functionality
+$(document).on('input', '#otpInputs input', function(e) {
+    const $this = $(this);
+    const value = $this.val();
+
+    // Handle paste
+    if (e.originalEvent && e.originalEvent.clipboardData) {
+        const pastedData = e.originalEvent.clipboardData.getData('text');
+        if (pastedData.length > 6) {
+            // If pasted data is longer than 6, we only take the first 6 characters
+            const otpArray = pastedData.slice(0, 6).split('');
+            $('#otpInputs input').each((index, input) => {
+                $(input).val(otpArray[index] || '');
+            });
+            return;
+        }
     }
-</script>
+
+    // Move to next input field
+    if (value.length === 1) {
+        const nextInput = $this.next('input');
+        if (nextInput.length) {
+            nextInput.focus();
+        }
+    }
+
+    // Handle backspace
+    if (e.key === 'Backspace' && value.length === 0) {
+        const prevInput = $this.prev('input');
+        if (prevInput.length) {
+            prevInput.focus();
+        }
+    }
+});
+
+// Ensure only numbers can be entered in OTP fields
+$(document).on('keydown', '#otpInputs input', function(e) {
+    if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Tab') {
+        e.preventDefault();
+    }
+});
+
+        function validateAndSubmit(event) {
+            event.preventDefault();
+            if (!$('#submitButton').is(':disabled')) {
+                const formData = new FormData($('#uploadForm')[0]);
+                $.ajax({
+                    url: `${API_BASE_URL}/api/FileUpload/UploadData`,
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(result) {
+                        alert(result.message || 'ফাইল সফলভাবে আপলোড হয়েছে।');
+                        $('#uploadForm')[0].reset();
+                        $('#fileList').empty().addClass('hidden');
+                        validateForm();
+                    },
+                    error: function() {
+                        alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+                    }
+                });
+            } else {
+                alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
+            }
+        }
+    </script>
+}
