@@ -132,7 +132,7 @@
 
 @section Scripts{
     <script>
-        const API_BASE_URL = '@Configuration["API:baseUrl"]';
+       // const API_BASE_URL = '@Configuration["API:baseUrl"]';
         
         $(document).ready(function () {
             // Initialize location detection
@@ -166,7 +166,7 @@
 
         function loadDivisions() {
             $.ajax({
-                url: `${API_BASE_URL}/api/MasterData/GetDivisionByCountryId?cId=1`,
+                url: `/api/MasterData/GetDivisionByCountryId?cId=1`,
                 type: 'POST',
                 success: function (data) {
                     populateDropdown('#division', data, 'divisionNameBn', 'id');
@@ -183,7 +183,7 @@
             if (!divisionId) return;
 
             $.ajax({
-                url: `${API_BASE_URL}/api/MasterData/GetDistrictByDivisionId?dId=${divisionId}`,
+                url: `/api/MasterData/GetDistrictByDivisionId?dId=${divisionId}`,
                 type: 'POST',
                 success: function (data) {
                     populateDropdown('#district', data, 'districtNameBn', 'id');
@@ -200,7 +200,7 @@
             if (!districtId) return;
 
             $.ajax({
-                url: `${API_BASE_URL}/api/MasterData/GetThanaByDistrictId?dId=${districtId}`,
+                url: `/api/MasterData/GetThanaByDistrictId?dId=${districtId}`,
                 type: 'POST',
                 success: function (data) {
                     populateDropdown('#thana', data, 'thanaNameBn', 'id');
@@ -217,7 +217,7 @@
             if (!thanaId) return;
 
             $.ajax({
-                url: `${API_BASE_URL}/api/MasterData/GetUnionWardsByThanaId?tId=${thanaId}`,
+                url: `/api/MasterData/GetUnionWardsByThanaId?tId=${thanaId}`,
                 type: 'POST',
                 success: function (data) {
                     populateDropdown('#union', data, 'unionNameBn', 'id');
@@ -234,7 +234,7 @@
             if (!unionId) return;
 
             $.ajax({
-                url: `${API_BASE_URL}/api/MasterData/GetAllVillageByUnionId?uId=${unionId}`,
+                url: `/api/MasterData/GetAllVillageByUnionId?uId=${unionId}`,
                 type: 'POST',
                 success: function (data) {
                     populateDropdown('#village', data, 'villageNameBn', 'id');
@@ -415,43 +415,84 @@ $(document).on('keydown', '#otpInputs input', function(e) {
     }
 });
 
-        function validateAndSubmit(event) {
-            event.preventDefault();
-            if (!$('#submitButton').is(':disabled')) {
-                const formData = new FormData($('#uploadForm')[0]);
-                $.ajax({
-                    url: `${API_BASE_URL}/api/FileUpload/UploadData`,
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function (result) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'ফাইল সফলভাবে আপলোড হয়েছে।',
-                            confirmButtonText: 'ঠিক আছে',
-                            confirmButtonColor: '#3085d6'
-                        });
-                        $('#uploadForm')[0].reset();
-                        $('#fileList').empty().addClass('hidden');
-                        validateForm();
-                    },
-                    // error: function () {
-                    //     alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
-                    // },
-                    error: function (xhr, status, error) {
-                        console.error(`Error: ${error}`);
-                        console.error(`Status: ${status}`);
-                        console.error(xhr.responseText);
-                        alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
-                    },
+        // function validateAndSubmit(event) {
+        //     event.preventDefault();
+        //     if (!$('#submitButton').is(':disabled')) {
+        //         const formData = new FormData($('#uploadForm')[0]);
+        //         $.ajax({
+        //             url: `${API_BASE_URL}/api/FileUpload/UploadData`,
+        //             type: 'POST',
+        //             data: formData,
+        //             processData: false,
+        //             contentType: false,
+        //             success: function (result) {
+        //                 Swal.fire({
+        //                     icon: 'success',
+        //                     title: 'Success',
+        //                     text: 'ফাইল সফলভাবে আপলোড হয়েছে।',
+        //                     confirmButtonText: 'ঠিক আছে',
+        //                     confirmButtonColor: '#3085d6'
+        //                 });
+        //                 $('#uploadForm')[0].reset();
+        //                 $('#fileList').empty().addClass('hidden');
+        //                 validateForm();
+        //                 window.location.reload();
+        //             },
+        //             // error: function () {
+        //             //     alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+        //             // },
+        //             error: function (xhr, status, error) {
+        //                 console.error(`Error: ${error}`);
+        //                 console.error(`Status: ${status}`);
+        //                 console.error(xhr.responseText);
+        //                 alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+        //             },
 
-                });
+        //         });
 
-            } else {
-                alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
-            }
+        //     } else {
+        //         alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
+        //     }
+        // }
+
+            function validateAndSubmit(event) {
+        event.preventDefault();
+        if (!$('#submitButton').is(':disabled')) {
+            const formData = new FormData($('#uploadForm')[0]);
+            $.ajax({
+                url: `/api/FileUpload/UploadData`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'ফাইল সফলভাবে আপলোড হয়েছে।',
+                        confirmButtonText: 'ঠিক আছে',
+                        confirmButtonColor: '#3085d6'
+                    }).then((result) => {
+                        // This code will run after the user clicks 'OK' on the SweetAlert
+                        if (result.isConfirmed) {
+                            $('#uploadForm')[0].reset();
+                            $('#fileList').empty().addClass('hidden');
+                            validateForm();
+                            window.location.reload();
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error(`Error: ${error}`);
+                    console.error(`Status: ${status}`);
+                    console.error(xhr.responseText);
+                    alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+                },
+            });
+        } else {
+            alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
         }
+    }
+
     </script>
 }

@@ -1,0 +1,613 @@
+﻿@page
+@model DropSpace.Areas.Auth.Pages.RegisterModel
+@{
+    ViewData["Title"] = "Registration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+<link rel="stylesheet" href="~/plugins/timepicker/bootstrap-timepicker.min.css">
+<div class="row text-info">
+    <ol class="breadcrumb text-center" style="font-size:22px;">
+        <li><a href="#"><i class="fa fa-user"></i> New User</a></li> / 
+        <li class="text-right"><a href="/Auth/Account/UserList"><i class="fa fa-users"></i> User List</a></li>
+    </ol>
+
+</div>
+@*asp-area="Shagotom" asp-controller="EmployeeInfo" asp-action="CreateNewUser"*@
+
+<form id="frmNewUser" enctype="multipart/form-data" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="row">
+            <div class="col-md-3"></div>
+        <div class="col-md-6">
+                
+                <div class="input-group">
+                <span class="input-group-addon p-0 m-0" >
+                    <select class="p-0 m-0" id="civbp" style="height:40px;">
+                        <option value="BP">BP</option>
+                        <option value="CIV">CIV</option>
+                    </select>
+                </span>
+                    <input type="text" class="form-control" id="bpNoSearch" placeholder="BP No" autocomplete="off">
+                    <div class="input-group-append">
+                        <span class="input-group-text" style="height:40px;"><i class="fa fa-search" style="cursor:pointer;"></i></span>
+                    </div>
+                </div>
+            </div>
+        
+            @*<div class="input-group col-md-6">
+                <span class="input-group-addon p-0 m-0">
+                    <select class="p-0 m-0" id="civbp">
+                        <option value="BP">BP</option>
+                        <option value="CIV">CIV</option>
+                    </select>
+                </span>
+                <input type="text" class="form-control" id="bpNoSearch" placeholder="BP No" autocomplete="off">
+                <span class="input-group-addon" id="loadData"><i class="fa fa-search" style="cursor:pointer;"></i></span>
+            </div>*@
+        </div>
+        <div style="height:20px;"></div>
+    <div class="row">
+        <div class="col-md-1"></div>
+
+        <div class="col-md-5">
+            <br />
+            <input type="hidden" id="visitorTypeId" name="" value="1" />
+
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">Name <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="text" class="form-control" name="empName" id="empName" placeholder="Name" autocomplete="off">
+                    <input type="hidden" class="form-control" id="bpNo" name="bpNo">
+                    <input type="hidden" class="form-control" id="empNameBn" name="empNameBn">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">PIMS Unit <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="text" class="form-control" id="unitName" name="unitName" placeholder="Unit" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">Mobile <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="text" class="form-control" id="vMobile" name="mobile" onkeypress="return validateNumber(event)" maxlength="11" placeholder="Mobile">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">Email <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="text" class="form-control" id="vEmail" name="email" placeholder="Email">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">Designation <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input class="form-control" id="designationName" name="designationName" placeholder="Designation" />
+                </div>
+            </div>
+           
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">Sub Unit <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <select class="select2 form-control mb-3 custom-select" style="width: 100%;" name="sectionId" id="sectionId">
+                        <option value="0">Select Sub Unit</option>
+                        
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">NID <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="text" class="form-control" id="nid" name="nid" placeholder="NID">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-5">
+            <br />
+
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">User Id <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="text" class="form-control" id="userId" name="userId" placeholder="User Id" readonly>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">User Role <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <select class="select2 form-control mb-3 custom-select" style="width: 100%;" name="roleId" id="roleId" required>
+                        <option value="0">Select</option>
+                        @foreach (var item in Model.roleNames)
+                        {
+                        <option value="@item.roleName">@item.roleName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">Password <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="password" class="form-control" name="password" id="password">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="example-search-input" class="col-md-3 col-12 col-form-label">Confirm Password <span style="color:red">*</span></label>
+                <div class="col-md-9 col-sm-12">
+                    <input type="password" class="form-control" name="confirmPassword" id="confirmPassword" onkeyup="passwordMatch()">
+                </div>
+            </div>
+
+            
+
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-6"></div>
+                    <div class="col-md-6">
+                        <input type="file" style="display:none;" name="formFile" id="imageUpload">
+                        <img src="~/logo/PhotoLogo.JPG" style="height:200px;width:200px;border:1px solid #ddd;background-color:#eee;cursor:pointer!important;" id="photoPicture" />
+
+                        <input type="hidden" id="photoPictures" name="photoPictures" />
+                        <input type="hidden" id="imgUrl" name="imgUrl" />
+                        <div style="height:10px;"></div>
+                        <label class="col-md-3">
+                            <input type="button" class="btn btn-info btn-sm" onclick="fnImageUpload()" value="Upload Photo">
+                        </label>
+                    </div>
+                    
+                </div>
+                   
+                
+            </div>
+
+        </div>
+
+        <div class="col-md-1"></div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <div class="row">
+        <div class="col-md-6">
+        </div>
+        
+        <div class="box box-success">
+
+            <div class="box-body" id="entryBody">
+
+
+                <img src="~/images/loder.gif" id="gifimage" style="display:none" />
+
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer text-center">
+                <button type="button" class="btn btn-info" style="width:90px;">Refresh</button>&nbsp;
+                <button type="button" onclick="formSubmitFunAprove()" class="btn btn-success" style="width:90px;">Submit</button>
+
+
+            </div>
+            <!-- /.box-footer -->
+        </div>
+    </div>
+</form>
+
+
+
+
+
+@section Scripts{
+    @*<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>*@
+    @*<script src="~/plugins/timepicker/bootstrap-timepicker.min.js"></script>*@
+    <script language="javascript">
+        $(document).ready(function () {
+            $("#branchId").select2();
+            $("#rankId").select2();
+            //$('#datepicker').datepicker({ dateFormat: "dd-M-yy", showAnim: "scale", changeMonth: true, changeYear: true, yearRange: "2015:2050" }).datepicker()
+            //$('#timePicker').timepicker({ showInputs: false });
+
+            //Common.Ajax('GET', '/global/api/VisitorEntry/GetAllEmployeeInfoWithPhoto', [], 'json', ajaxEmployeeList);
+        });
+
+        $("#imageUpload").change(function () {
+            var file = this.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                $("#photoPicture").attr("src", reader.result);
+                $("#imgUrl").val(reader.result);
+                $("#results").hide();
+                $('#photoPicture').show();
+            }
+            reader.readAsDataURL(file);
+        });
+
+        $('#loadData').click(function () {
+            $('#gifimage').show();
+            var bpnumber = $('#bpNoSearch').val();
+            if (bpnumber == null || bpnumber == '') {
+                Swal.fire('Sorry', 'Please Enter BP Number!', 'warning')
+                $('#gifimage').hide();
+                return false;
+            }
+            var type = $('#civbp').val();
+            var bp = type + bpnumber;
+            Common.Ajax('GET', '/Auth/Account/GetPIMSDataByBPNo?bpNo=' + bp, [], 'json', ajaxGetImage, false);
+        });
+
+        $('#bpNoSearch').on('keyup', function () {
+            var bpnumber = $('#bpNoSearch').val();
+            if (bpnumber.length == 10) {
+                $('#gifimage').show();
+
+                if (bpnumber == null || bpnumber == '') {
+                    Swal.fire('Sorry', 'Please Enter BP Number!', 'warning')
+                    $('#gifimage').hide();
+                    return false;
+                }
+                var type = $('#civbp').val();
+                var bp = type + bpnumber;
+                Common.Ajax('GET', '/Auth/Account/GetPIMSDataByBPNo?bpNo=' + bp, [], 'json', ajaxGetImage, false);
+            }
+
+        });
+
+        function ajaxGetImage(res) {
+
+            $('#empName').val(`${res.english_name}`);
+            $('#empNameBn').val(`${res.bangla_name}`);
+            $('#bpNo').val(`${res.bp}`);
+            $('#designationName').val(res.present_rank);
+
+            $('#unitName').val(`${res.current_place_of_posting}`);
+            $('#vEmail').val(`${res.email}`);
+            $('#vMobile').val(`${replaceNumbers(res.phone)}`);
+            $('#nid').val(`${res.national_id}`);
+            //$('#bcsBatchId').val(`${res.bcsBatchId}`);
+            //$('#rankId').val(`${res.alphaRankId}`);
+            $('#userId').val(`${res.bp.replace(/BP/g, '').replace(/CIV/g, '')}`);
+
+            //$('#branchId').val(`${res.unit}`);
+            $('#photoPicture').attr('src', `data:image/png;base64,${res.picture}`);
+            //$('#photoPictures').val(`${res.picture}`);
+            $('#imgUrl').val(`data:image/png;base64,${res.picture}`);
+            $('#photoPicture').show();
+            $("#results").hide();
+            $('#gifimage').hide();
+        };
+
+        function passwordMatch() {
+            var passwordInput = $('#password');
+            var confirmPasswordInput = $('#confirmPassword');
+
+            // Add a keyup event listener to the confirm password input
+            confirmPasswordInput.keyup(function () {
+                // Get the values of the password and confirm password inputs
+                var passwordValue = passwordInput.val();
+                var confirmPasswordValue = confirmPasswordInput.val();
+
+                // Check if the two values match
+                if (passwordValue === confirmPasswordValue) {
+                    // If they match, show a green checkmark next to the confirm password field
+                    $('#confirm-password-status').html('<i class="fa fa-check-circle text-success"></i>');
+                } else {
+                    // If they don't match, show a red X next to the confirm password field
+                    $('#confirm-password-status').html('<i class="fa fa-times-circle text-danger"></i>');
+                }
+            });
+        }
+
+        function fnVisitorType(typeId) {
+
+            resetEntryForm('entryBody');
+
+            $('#visitorTypeId').val(typeId);
+        }
+        function resetEntryForm(divId) {
+            // Get the div element
+
+            const myImage = $('#photoPicture');
+
+            // Set the new source attribute value
+            myImage.attr('src', 'new_image_url.jpg');
+            const myDiv = document.getElementById(divId);
+
+            // Get all the input elements under the div
+            const inputElements = myDiv.querySelectorAll('input:not([type="button"])');
+
+            // Loop through all the input elements and set their value to a new value
+            inputElements.forEach(input => {
+                input.value = '';
+            });
+
+        }
+
+
+        function fnImageUpload() {
+            $('#imageUpload').click();
+        }
+
+        function formSubmitFunAprove() {
+
+            var myData = $("#frmNewUser").serialize();
+            var rankId = $('#rankId').val();
+            var branchId = $('#branchId').val();
+            var roleId = $('#roleId').val();
+            var userId = $('#userId').val();
+            var password = $('#password').val();
+            var confirmPassword = $('#confirmPassword').val();
+            if (rankId == 0) {
+                Swal.fire('warning', 'Please select Rank!', 'warning');
+                return false;
+            } else if (branchId == 0) {
+                Swal.fire('warning', 'Please select unit!', 'warning');
+                return false;
+            }
+            else if (roleId == 0) {
+                Swal.fire('warning', 'Please select User Role!', 'warning');
+                return false;
+            }
+            else if (userId == '') {
+                Swal.fire('warning', 'Invalid Attempt!', 'warning');
+                return false;
+            } else if (password == '') {
+                Swal.fire('warning', 'Please entered password!', 'warning');
+                return false;
+            }
+            else if (password != confirmPassword) {
+                Swal.fire('warning', 'Password and Confirm Password must be same!', 'warning');
+                return false;
+            } else {
+
+            }
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want save this record!',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Save it!'
+            }).then(function () {
+
+                $.ajax({
+                    url: "/Auth/Account/CreateNewUser",
+                    type: "post",
+                    data: myData,
+                    success: function (response) {
+
+                        if (response == "success") {
+
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Save Successfully!',
+                                type: 'success',
+                                confirmButtonColor: '#3085d6'
+
+                            }).then(function () {
+                                window.location.href = "/Auth/Account/UserList";
+                            });
+
+                        }
+                        else {
+                            Swal.fire('Warning!', 'Unable to save!', 'warning').then(function () {
+                                window.location.href = "/Auth/Account/UserList";
+                            });
+                        }
+
+                    }
+                });
+            });
+        }
+
+
+        function loadSectionListByUnitId(){
+            var unitId=$('#branchId').val();
+            Common.Ajax('GET', '/Auth/Account/GetSectionByUnit?unitId=' + unitId, [], 'json', ajaxUnitList, false);
+        }
+
+        function ajaxUnitList(res){
+            console.log(res);
+            $('#sectionId').empty();
+            $("#sectionId").append('<option value="">Select Sub Unit</option>')
+            $.each(res, function (i, v) {
+                $("#sectionId").append('<option value="' + v.id + '">' + v.name + '</option>')
+            });
+        }
+
+        function formSubmitFun() {
+
+            var myData = $("#myForm").serialize();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want save this record!',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, Save it!'
+            }).then(function () {
+
+                $.ajax({
+                    url: "/Shagotom/VisitorEntry/Index",
+                    type: "post",
+                    data: myData,
+                    success: function (response) {
+
+                        if (response == "success") {
+
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Save Successfully!',
+                                type: 'success',
+                                confirmButtonColor: '#3085d6'
+
+                            }).then(function () {
+                                window.location.href = "/Shagotom/ShagotomDashboard/Index";
+                            });
+
+                        }
+                        else {
+                            Swal.fire('Warning!', 'Unable to save!', 'warning').then(function () {
+                                window.location.href = "/Shagotom/VisitorEntry/Index";
+                            });
+                        }
+
+                    }
+                });
+            });
+        }
+
+        function officerNameChangeFun() {
+
+            //var id = $("#officerName").select2("val");
+            var id = $("#officerName option:selected").val();
+
+            $.ajax({
+                url: "/Shagotom/VisitorEntry/GetEmployeeInfoById",
+                type: "get",
+                data: { id: id },
+                success: function (res) {
+
+                    if (res != null) {
+
+                        $("#email").val('');
+                        $("#mobile").val('');
+                        $("#department").val('');
+                        $("#designation").val('');
+                        $("#officer_img_id").empty();
+
+                        // set new data
+                        $("#Id").val(res.Id);
+                        $("#email").val(res.emailAddress);
+                        $("#mobile").val(res.mobileNumberPersonal);
+                        $("#department").val(res.department);
+                        $("#designation").val(res.designation);
+
+                        var img = '<img src="/' + res.imgUrl + '" style="height: 140px; width: 140px;"/>';
+
+                        $("#officer_img_id").append(img);
+                    } else {
+
+                        $("#email").val('');
+                        $("#mobile").val('');
+                        $("#department").val('');
+                        $("#designation").val('');
+
+                        $("#officer_img_id").empty();
+
+                    }
+                }
+            });
+        }
+
+        function deleteInfo(index) {
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want delete this record!',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then(function () {
+
+                var tbody = $("#selected_list_table").find('tbody');
+
+                tbody.find('#index_' + index).remove();
+            });
+        }
+
+        function refreshForm() {
+
+            $('#bpNo').val('');
+            $('#visitorName').val('');
+            $('#empName').val('');
+            $('#unitName').val('');
+            //$('#bpNoSearch').val('');
+            $('#designationName').val('');
+            $('#npDesignationName').val('');
+            $('#address').val('');
+            $('#vEmail').val('');
+            $('#npEmail').val('');
+            $('#vMobile').val('');
+            $('#npMobile').val('');
+            $('#npOccupation').val('');
+            $('#companyName').val('');
+            $('#nid').val('');
+            $('#npNid').val('');
+            $("#imgUrl").val('');
+            $("#photoPicture").val('');
+            $("#photoPicture").attr('src', '');
+            $("#designationId").val('').trigger('change');
+            $("#occupationId").val('').trigger('change');
+            $("#date").val('@DateTime.Now.Date');
+            $("#results").empty();
+            $("#results").append('<p>Your captured image will appear here...</p>');
+
+        }
+
+
+        function replaceNumbers(input) {
+            var numbers = {
+                '০': 0,
+                '১': 1,
+                '২': 2,
+                '৩': 3,
+                '৪': 4,
+                '৫': 5,
+                '৬': 6,
+                '৭': 7,
+                '৮': 8,
+                '৯': 9
+            };
+            var output = [];
+            for (var i = 0; i < input.length; ++i) {
+                if (numbers.hasOwnProperty(input[i])) {
+                    output.push(numbers[input[i]]);
+                } else {
+                    output.push(input[i]);
+                }
+            }
+            return output.join('');
+        };
+
+        function ajaxEmployeeList(response) {
+            var GetEmployeeList = [];
+            $.each(response, function (id, option) {
+                var obj = new Object();
+                obj.key = option.Id;
+                obj.value = option.employeeCode + ' - ' + option.nameEnglish;
+                obj.email = option.emailAddressPersonal;
+                obj.department = option.department?.deptName;
+                obj.designation = option.designations?.designationName;
+                obj.imageUrl = option.photoUrl;
+                obj.mobileNumberPersonal = option.mobileNumberPersonal;
+                GetEmployeeList[GetEmployeeList.length] = obj;
+            });
+            $('#employeeName').autocomplete({
+                source: GetEmployeeList,
+                select: function (event, ui) {
+                    $("#employeeName").val(ui.item.value);
+                    $("#employeeId").val(ui.item.key);
+                    $("#email").val(ui.item.email);
+                    $("#mobile").val(ui.item.mobileNumberPersonal);
+                    $("#department").val(ui.item.department);
+                    $("#designation").val(ui.item.designation);
+                    $("#employeePhoto").attr('src', ui.item.imageUrl);
+                }
+            });
+        }
+        function validateNumber(e) {
+            const pattern = /^[0-9]$/;
+            return pattern.test(e.key)
+        }
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
+}
+
+

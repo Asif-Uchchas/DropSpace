@@ -1,0 +1,201 @@
+﻿@model ApplicationRoleViewModel
+@{
+    ViewData["Title"] = "User Role Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card" style="width: 100%;">
+    <div class="card-body">
+        <h5 class="card-title" style="color: #4e73df!important;">User Role Information</h5>
+        <hr>
+        <div class="container">
+            <form asp-area="Auth" asp-controller="Account" asp-action="UserIdentityRoleCreate" method="post">
+
+
+                <div class="form-group row">
+
+                    <label for="RoleName" class="col-sm-4 col-form-label">Role Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="RoleName" id="RoleName">
+                        <input type="hidden" class="form-control" name="RoleId" id="RoleId">
+                    </div>
+                </div>
+
+                <hr />
+                <button type="submit" id="btnSubmit" value="Submit" class="btn btn-success btn-lg" style="float:right; margin-top:5px;"><i class="fa fa-save"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<br />
+<hr />
+<div class="row clearfix">
+    <div class="col-12">
+        <div class="card mb-4">
+            <!-- Card Header - Dropdown -->
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Role List</h6>
+            </div>
+            <!-- Card Body -->
+            <div class="card-body">
+                <table class="table table-striped table-bordered" id="countryTable">
+                    <thead>
+                        <tr>
+                            @*<th>Module</th>*@
+                            <th>Role Name</th>
+                            @*<th>Description</th>*@
+                            <th>Action</th>
+                    </thead>
+                    <tbody>
+                        @foreach (var data in Model.roleViewModels)
+                        {
+                            <tr>
+                                @*<td>@data.moduleName</td>*@
+                                <td>@data.RoleName</td>
+                                @*<td>@data.description</td>*@
+                                <td>
+                                    <a class="btn btn-success" onclick="Edit('@data.RoleId', '@data.RoleName')" href="#"><i class="fa fa-edit"></i></a>
+                                    <a class="btn btn-danger" onclick="Remove('@data.RoleId')" href="#"><i class="fa fa-trash"></i></a>
+                                    <a class="btn btn-info" onclick="MenuList('@data.RoleId')" title="Role Menu List" href="#"><i class="fa fa-list"></i></a>
+                                </td>
+                            </tr>
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="sectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row" style="width:100%;">
+                    <div class="col-11">
+                        <h3 class="modal-title text-center" id="exampleModalLabel" style="font-size: 20px;padding-top: 14px; color:black">Add Section</h3>
+                        <input type="hidden" id="DeleteRoleId" value="" />
+                    </div>
+                    <div class="col-1">
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered" id="SubtaskTable">
+                    <thead>
+                        <tr>
+                            <th>Role Name</th>
+                            <th>Assign Menu Name</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" type="button" onclick="DeleteMenu()">Delete All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+
+        function SaveRole() {
+            if ($('#RoleName').val() === '') {
+                alert("Enter Role Name.");
+                return false;
+            }
+
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                url: '@Url.Action("UserIdentityRoleCreate", "Account", "http")',
+                type: "POST",
+                dataType: 'json',
+                async: true,
+                data: { roleName: $('#RoleName').val() },
+                success: function (data) {
+
+                    alert($("#RoleName").val() + ' Data is Saved Successfully');
+
+                },
+                error: function () {
+                    alert("Fail to save");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $('#countryTable').DataTable();
+        });
+
+        function Edit(Id, name) {
+            $("#RoleId").val(Id);
+            $("#RoleName").val(name);
+        }
+
+        function Remove(index) {
+            swal({
+                title: 'Are you sure?', text: 'Do you want to Delete this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, Delete it!'
+            }).then(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/Auth/Account/DeleteRoles/" + index,
+                    success: function (response) {
+                        if (response == "Success") {
+                            swal('', 'Delete Successfully!', 'success');
+                            location.reload(true);
+                        } else {
+                            swal('', response, 'warning');
+                        }
+                    }
+                });
+            });
+            return false;
+        }
+
+        function MenuList(index) {
+            $("#DeleteRoleId").val(index);
+            Common.Ajax('GET', '/global/api/getAllUserAccessPages/' + index, [], 'json', getAllUserAccessPages, false);
+        }
+
+        function getAllUserAccessPages(response) {
+            $("#SubtaskTable").DataTable().destroy();
+            $("#SubtaskTable tbody>tr").empty();
+            $.each(response, function (key, value) {
+                var dtTable = $("#SubtaskTable");
+                var tableBody = dtTable.find('tbody');
+                var trHtml = '<tr>' +
+                    '<td>' + value.applicationRole.Name + '</td>' +
+                    '<td>' + value.navbar.nameOption + '</td>' +
+                    '</tr>';
+                tableBody.append(trHtml);
+            })
+            $("#SubtaskTable").DataTable();
+            $("#sectionModal").modal();
+        }
+
+        function DeleteMenu() {
+            var index = $("#DeleteRoleId").val();
+            swal({
+                title: 'Are you sure?', text: 'Do you want to delete this record!', type: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'Yes, delete it!'
+            }).then(function () {
+                window.location.href = "/Auth/Account/DeleteMenu?Id=" + index;
+                swal('', 'Deleted Successfully!', 'success')
+            });
+            return false;
+        }
+
+    </script>
+}
+
+
+
