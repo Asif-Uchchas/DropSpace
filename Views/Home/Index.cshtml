@@ -125,7 +125,7 @@
 
                 <!-- Submit Button -->
                 <div class="mt-8 text-center">
-                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200" id="submitButton" disabled>
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 hidden" id="submitButton">
                         সমস্ত তথ্য জমা দিন
                     </button>
                 </div>
@@ -398,7 +398,7 @@
                 data: JSON.stringify({ mobileNumber, otp }),
                 success: function () {
                     $('#verifyOTPButton').addClass('hidden');
-                    $('#verifyOTPButton').removeClass('hidden');
+                    $('#verifyOTPButtonSuccess').removeClass('hidden');
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
@@ -407,6 +407,9 @@
                         confirmButtonColor: '#3085d6'
                     });
                     validateForm();
+
+                    // Show the submit button after successful OTP verification
+                    $('#submitButton').removeClass('hidden'); // Show the submit button
                 },
                 error: function () {
                     Swal.fire({
