@@ -60,6 +60,7 @@ namespace DropSpace.ERPServices.PersonData
                         {
                             Id = uf.Id,
                             AttachmentUrl = uf.attachmentUrl,
+                            uploadDatetime=uf.createdAt,
                             CreatedAt = uf.createdAt,
                         }
                     })
