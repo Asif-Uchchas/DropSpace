@@ -1,5 +1,7 @@
 ﻿using DropSpace.Areas.Home.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Hosting;
 using System.Net.Http;
 using System.Text.Json;
 
@@ -10,11 +12,19 @@ namespace DropSpace.Areas.Home.Controllers
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogger<MediaController> _logger;
 
-        public MediaController(HttpClient httpClient, IConfiguration configuration)
+        public MediaController(
+            HttpClient httpClient,
+            IConfiguration configuration,
+            IWebHostEnvironment webHostEnvironment,
+            ILogger<MediaController> logger)
         {
             _httpClient = httpClient;
-            _configuration = configuration; 
+            _configuration = configuration;
+            _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index(string mobile)
@@ -29,15 +39,10 @@ namespace DropSpace.Areas.Home.Controllers
                 try
                 {
                     var baseUrl = _configuration["API:baseUrl"];
-                    var apiUrl = baseUrl + "/api/FileUpload/GetPersonDataByMobile?mobile=" + mobile;
-                    var handler = new HttpClientHandler
-                    {
-                        ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-                    };
+                    var apiUrl = $"{baseUrl}/api/FileUpload/GetPersonDataByMobile?mobile={mobile}";
 
-                    using var client = new HttpClient(handler);
-                    // Make POST request with empty content since data is in query string
-                    var response = await client.PostAsync(apiUrl, null);
+                    // Remove custom handler, use default HttpClient
+                    var response = await _httpClient.PostAsync(apiUrl, null);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -53,11 +58,23 @@ namespace DropSpace.Areas.Home.Controllers
                                     foreach (var file in filesArray.EnumerateArray())
                                     {
                                         var url = file.GetProperty("attachmentUrl").GetString();
-                                        model.Files.Add(new MediaFileViewModel
+                                        var fileName = Path.GetFileName(url);
+                                        var serverPath = Path.Combine(_webHostEnvironment.WebRootPath, "ufile", fileName);
+
+                                        // Validate file exists
+                                        if (System.IO.File.Exists(serverPath))
                                         {
-                                            Url = url,
-                                            FileType = GetFileType(url)
-                                        });
+                                            model.Files.Add(new MediaFileViewModel
+                                            {
+                                                // Use a web-accessible path
+                                                Url = $"/ufile/{fileName}",
+                                                FileType = GetFileType(fileName)
+                                            });
+                                        }
+                                        else
+                                        {
+                                            _logger.LogWarning($"File not found: {serverPath}");
+                                        }
                                     }
                                 }
                             }
@@ -66,11 +83,13 @@ namespace DropSpace.Areas.Home.Controllers
                     else
                     {
                         var errorContent = await response.Content.ReadAsStringAsync();
-                        ModelState.AddModelError(string.Empty, $"Failed to retrieve data. Status: {response.StatusCode}. Error: {errorContent}");
+                        _logger.LogError($"API request failed. Status: {response.StatusCode}. Error: {errorContent}");
+                        ModelState.AddModelError(string.Empty, $"Failed to retrieve data. Status: {response.StatusCode}");
                     }
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "An error occurred while fetching media files");
                     ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
                 }
             }
@@ -78,73 +97,9 @@ namespace DropSpace.Areas.Home.Controllers
             return View(model);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> FetchMedia(string mobile)
-        {
-            if (string.IsNullOrWhiteSpace(mobile))
-            {
-                ModelState.AddModelError(string.Empty, "Mobile number cannot be empty.");
-                return View("Index", new MediaViewModel { Files = new List<MediaFileViewModel>() });
-            }
-
-            try
-            {
-                var apiUrl = $"https://localhost:7145/api/FileUpload/GetPersonDataByMobile?mobile={mobile}";
-                var handler = new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
-                };
-
-                using var client = new HttpClient(handler);
-                var response = await client.GetAsync(apiUrl);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    ModelState.AddModelError(string.Empty, "Failed to retrieve data from the server.");
-                    return View("Index", new MediaViewModel { Files = new List<MediaFileViewModel>() });
-                }
-
-                var content = await response.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<List<JsonElement>>(content);
-
-                var files = new List<MediaFileViewModel>();
-
-                if (data != null)
-                {
-                    foreach (var person in data)
-                    {
-                        if (person.TryGetProperty("uploadedFiles", out var filesArray))
-                        {
-                            foreach (var file in filesArray.EnumerateArray())
-                            {
-                                var url = file.GetProperty("attachmentUrl").GetString();
-
-                                // No need to set FileName explicitly; it will be derived from the Url
-                                files.Add(new MediaFileViewModel
-                                {
-                                    Url = url,
-                                    FileType = GetFileType(url)
-                                });
-                            }
-                        }
-                    }
-                }
-
-                var viewModel = new MediaViewModel { Files = files };
-                return View("Index", viewModel);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
-                return View("Index", new MediaViewModel { Files = new List<MediaFileViewModel>() });
-            }
-        }
-
-
         private string GetFileType(string url)
         {
             if (string.IsNullOrEmpty(url)) return "other";
-
             return Path.GetExtension(url)?.ToLower() switch
             {
                 ".mp4" or ".avi" or ".mov" or ".wmv" => "video",

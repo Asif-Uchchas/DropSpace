@@ -9,12 +9,15 @@ using DropSpace.ERPServices.PersonData.Interfaces;
 using DropSpace.ERPServices.PersonData;
 using DropSpace.Repository;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.JsonPatch.Internal;
 using Microsoft.EntityFrameworkCore;
 using DropSpace.Services.Dapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add logging configuration
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 builder.Services.AddDbContext<DropSpaceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -30,7 +33,7 @@ builder.WebHost.ConfigureKestrel(options =>
     options.Limits.MaxRequestBodySize = 2147483648; // Set to 2 GB (in bytes)
 });
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllersWithViews();
 
 // Register application-specific services
@@ -39,22 +42,23 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserInfoes, UserInfoes>();
 builder.Services.AddScoped<IPersonData, PersonData>();
 builder.Services.AddScoped<IMasterData, MasterDataService>();
+
+// Add HttpClient and WebHostEnvironment
 builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
+app.UseStaticFiles(); // Ensure static files middleware is configured
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
