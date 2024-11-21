@@ -24,6 +24,7 @@ namespace DropSpace.Context
         public DbSet<UnionWard> UnionWards { get; set; }
         public DbSet<RangeMetro> RangeMetros { get; set; }
         public DbSet<Village> Villages { get; set; }
+        public DbSet<CrimeInfo> crimeInfos { get; set; }
         #endregion
 
 

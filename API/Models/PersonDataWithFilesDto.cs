@@ -11,6 +11,7 @@
         public string? VillageName { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }
+        public DateTime? createdAt { get; set; }
         public List<UploadedFileDto>? UploadedFiles { get; set; }
     }
 
@@ -18,5 +19,6 @@
     {
         public int Id { get; set; }
         public string? AttachmentUrl { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 }

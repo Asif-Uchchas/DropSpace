@@ -2,6 +2,7 @@
 using DropSpace.Context;
 using DropSpace.Data.Entity.Droper;
 using DropSpace.ERPServices.PersonData.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -43,6 +44,7 @@ namespace DropSpace.ERPServices.PersonData
                     VillageName = p.village != null ? p.village.villageName : null,
                     Latitude = p.latitude,
                     Longitude = p.longitude,
+                    createdAt=p.createdAt,
                     UploadedFiles = new List<UploadedFileDto>()
                 })
                 .ToListAsync();
@@ -57,7 +59,8 @@ namespace DropSpace.ERPServices.PersonData
                         FileDto = new UploadedFileDto
                         {
                             Id = uf.Id,
-                            AttachmentUrl = uf.attachmentUrl
+                            AttachmentUrl = uf.attachmentUrl,
+                            CreatedAt = uf.createdAt,
                         }
                     })
                     .ToListAsync();

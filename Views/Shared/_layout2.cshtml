@@ -4,7 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - DropSpace</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
@@ -19,6 +20,7 @@
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             display: flex;
             flex-direction: column;
+            padding-top: 60px;
         }
 
         .custom-navbar {
@@ -67,8 +69,8 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg custom-navbar">
+    <!-- Navbar with fixed-top class -->
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                 <i class="fas fa-cloud-upload-alt me-2"></i>DropSpace
@@ -76,28 +78,28 @@
             <div class="ms-auto d-flex align-items-center">
                 <!-- Notifications -->
                 <div class="dropdown me-3">
-                    <button class="btn btn-link text-dark notification-badge" data-bs-toggle="dropdown">
+                    <button class="btn btn-link text-dark notification-badge" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-bell"></i>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <h6 class="dropdown-header">Notifications</h6>
-                        <a class="dropdown-item" href="#">Your file has been uploaded</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-center" href="#">View all</a>
-                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><a class="dropdown-item" href="#">Your file has been uploaded</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center" href="#">View all</a></li>
+                    </ul>
                 </div>
                 <!-- Profile -->
                 <div class="dropdown">
-                    <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
+                    <button class="btn btn-link text-dark d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
                         <span>User Name</span>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end">
-                        <a class="dropdown-item" href="/profile">Profile</a>
-                        <a class="dropdown-item" href="/settings">Settings</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item text-danger" href="/logout">Logout</a>
-                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <li><a class="dropdown-item" href="/Auth/Account/MobileLogin">Profile</a></li>
+                        <li><a class="dropdown-item" href="/settings">Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -109,20 +111,19 @@
     </div>
 
     <!-- Footer -->
-    <footer>
-        &copy; 2024 - DropSpace · <a href="/privacy" class="text-decoration-none">Privacy</a> · <a href="#" class="text-decoration-none">Terms</a>
+    <footer class="sticky-footer bg-white">
+        <div class="container">
+            <div class="copyright text-center">
+                <span><a href="https://www.opus-bd.com/" target="_blank" style="text-decoration:none;"> OPUS Technology Ltd </a>&copy; @DateTime.Now.Year</span>
+            </div>
+        </div>
     </footer>
 
-    <!-- Scripts -->
-    @* <script src="~/lib/jquery/dist/jquery.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
+    <!-- Scripts in correct order -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js" type="text/javascript"></script>
-    <script src="https://code.jquery.com/jquery-migrate-3.0.0.min.js" type="text/javascript"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
