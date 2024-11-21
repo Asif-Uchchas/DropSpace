@@ -35,7 +35,8 @@ namespace DropSpace.Areas.Home.Controllers
         {
             if ((string.IsNullOrWhiteSpace(personsData?.name) || string.IsNullOrWhiteSpace(personsData?.mobile)) && (files == null || files.Count == 0))
             {
-                ViewBag.ErrorMessage = "Invalid input data. Either PersonsData with valid name and mobile must be provided, or files should be uploaded.";
+                ViewBag.MessageType = "error";
+                ViewBag.Message = "invalid_input";
                 return View();
             }
 
@@ -79,19 +80,22 @@ namespace DropSpace.Areas.Home.Controllers
                     await _persondata.AddUploadedFilesAsync(uploadedFilesList);
                 }
 
-                ViewBag.SuccessMessage = "Data uploaded successfully.";
+                ViewBag.MessageType = "success";
+                ViewBag.Message = "data_uploaded_successfully";
                 if (warningFiles.Any())
                 {
-                    ViewBag.WarningMessage = $"The following files were not saved: {string.Join(", ", warningFiles)}";
+                    ViewBag.WarningMessage = string.Join(", ", warningFiles);
                 }
             }
             else
             {
-                ViewBag.SuccessMessage = "PersonsData saved successfully, but no files were uploaded.";
+                ViewBag.MessageType = "success";
+                ViewBag.Message = "persons_data_saved_no_files";
             }
 
             return View();
         }
+
 
         public IActionResult Privacy()
         {

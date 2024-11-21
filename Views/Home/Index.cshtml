@@ -155,45 +155,40 @@
             }
 
 
-            @if (ViewBag.SuccessMessage != null)
-            {
-                <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: '@ViewBag.SuccessMessage',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6'
-                    });
-                </text>
-            }
+            const messageMap = {
+                "invalid_input": "অবৈধ ইনপুট! নাম এবং মোবাইল অথবা ফাইল প্রেরণ করা আবশ্যক।",
+                "data_uploaded_successfully": "ডেটা সফলভাবে আপলোড করা হয়েছে।",
+                "persons_data_saved_no_files": "পিপলস ডেটা সফলভাবে সংরক্ষিত হয়েছে, কিন্তু কোনো ফাইল আপলোড হয়নি।",
+                "warning_files": "ফাইলগুলি সংরক্ষণ করা হয়নি: "
+            };
 
-            // Check for warning message
-            @if (ViewBag.WarningMessage != null)
-            {
-                <text>
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Warning',
-                        text: '@ViewBag.WarningMessage',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6'
-                    });
-                </text>
+            // Check for success, error or warning messages
+            if ("@ViewBag.MessageType" === "success" && "@ViewBag.Message" !== "") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'সাফল্য',
+                    text: messageMap["@ViewBag.Message"],
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6'
+                });
             }
-
-            // Check for error message
-            @if (ViewBag.ErrorMessage != null)
-            {
-                <text>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: '@ViewBag.ErrorMessage',
-                        confirmButtonText: 'OK',
-                        confirmButtonColor: '#3085d6'
-                    });
-                </text>
+            else if ("@ViewBag.MessageType" === "error" && "@ViewBag.Message" !== "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ত্রুটি',
+                    text: messageMap["@ViewBag.Message"],
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
+            else if ("@ViewBag.MessageType" === "warning" && "@ViewBag.WarningMessage" !== "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'সতর্কতা',
+                    text: messageMap["@ViewBag.Message"] + "@ViewBag.WarningMessage",
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6'
+                });
             }
 
 
