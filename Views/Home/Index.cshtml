@@ -19,7 +19,7 @@
 
         <div class="mt-8 max-w-full sm:max-w-2xl mx-auto">
             <form id="uploadForm"
-                  action="/api/FileUpload/UploadData"
+                  action="@Url.Action("Index", "Home", new { area = "Home" })" 
                   method="POST"
                   enctype="multipart/form-data"
                   class="relative">
@@ -146,6 +146,49 @@
                     $('#longitude').val(position.coords.longitude);
                 });
             }
+
+
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: '@ViewBag.SuccessMessage',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6'
+                    });
+                </text>
+            }
+
+            // Check for warning message
+            @if (ViewBag.WarningMessage != null)
+            {
+                <text>
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning',
+                        text: '@ViewBag.WarningMessage',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6'
+                    });
+                </text>
+            }
+
+            // Check for error message
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '@ViewBag.ErrorMessage',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6'
+                    });
+                </text>
+            }
+
 
             loadDivisions();
 
@@ -419,45 +462,7 @@
             }
         });
 
-        // function validateAndSubmit(event) {
-        //     event.preventDefault();
-        //     if (!$('#submitButton').is(':disabled')) {
-        //         const formData = new FormData($('#uploadForm')[0]);
-        //         $.ajax({
-        //             url: `${API_BASE_URL}/api/FileUpload/UploadData`,
-        //             type: 'POST',
-        //             data: formData,
-        //             processData: false,
-        //             contentType: false,
-        //             success: function (result) {
-        //                 Swal.fire({
-        //                     icon: 'success',
-        //                     title: 'Success',
-        //                     text: 'ফাইল সফলভাবে আপলোড হয়েছে।',
-        //                     confirmButtonText: 'ঠিক আছে',
-        //                     confirmButtonColor: '#3085d6'
-        //                 });
-        //                 $('#uploadForm')[0].reset();
-        //                 $('#fileList').empty().addClass('hidden');
-        //                 validateForm();
-        //                 window.location.reload();
-        //             },
-        //             // error: function () {
-        //             //     alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
-        //             // },
-        //             error: function (xhr, status, error) {
-        //                 console.error(`Error: ${error}`);
-        //                 console.error(`Status: ${status}`);
-        //                 console.error(xhr.responseText);
-        //                 alert('আপলোড ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
-        //             },
-
-        //         });
-
-        //     } else {
-        //         alert('দয়া করে সমস্ত প্রয়োজনীয় তথ্য পূরণ করুন।');
-        //     }
-        // }
+        
 
         function validateAndSubmit(event) {
             event.preventDefault();
