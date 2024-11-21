@@ -1,7 +1,14 @@
 ﻿@model List<IFormFile>
 @{
     ViewData["Title"] = "Register";
-    Layout = "~/Views/Shared/_layout2.cshtml";
+    if (User.Identity.Name != null)
+    {
+        Layout = "~/Views/Shared/_layout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_layoutPublic.cshtml";
+    }
 }
 @inject IConfiguration Configuration
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />

@@ -77,7 +77,7 @@
             </a>
             <div class="ms-auto d-flex align-items-center">
                 <!-- Notifications -->
-                <div class="dropdown me-3">
+                @* <div class="dropdown me-3">
                     <button class="btn btn-link text-dark notification-badge" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-bell"></i>
                     </button>
@@ -87,18 +87,28 @@
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-center" href="#">View all</a></li>
                     </ul>
-                </div>
+                </div> *@
                 <!-- Profile -->
                 <div class="dropdown">
-                    <button class="btn btn-link text-dark d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
-                        <span>User Name</span>
+                    <button class="btn btn-link btn-danger btn-sm text-dark d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        @if (User.Identity.Name != null)
+                        {
+                            
+                        }
+                        else
+                        {
+                            <i class="fa fa-sign-in" aria-hidden="true" title="Log In"></i>
+                        }
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                        <li><a class="dropdown-item" href="/Auth/Account/MobileLogin">Profile</a></li>
-                        <li><a class="dropdown-item" href="/settings">Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                        @if (User.Identity.Name == null)
+                        {
+                            <li><a class="dropdown-item" href="/Auth/Account/MobileLogin">Log In</a></li>
+                        }
+                        else
+                        {
+                            <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                        }
                     </ul>
                 </div>
             </div>
