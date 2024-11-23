@@ -2,6 +2,7 @@
 using DropSpace.Context;
 using DropSpace.Data.Entity.Droper;
 using DropSpace.ERPServices.PersonData.Interfaces;
+using DropSpace.Helpers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ namespace DropSpace.ERPServices.PersonData
 
         public async Task<int> AddPersonsDataAsync(PersonsData personsData)
         {
-            _context.personsDatas.Add(personsData);
+            _context.personalDatas.Add(personsData);
             await _context.SaveChangesAsync();
             return personsData.Id;
         }
@@ -31,8 +32,7 @@ namespace DropSpace.ERPServices.PersonData
         }
         public async Task<List<PersonDataWithFilesDto>> GetPersonDataWithFilesByMobileAsync(string mobile)
         {
-            var personDataList = await _context.personsDatas
-                .Where(p => p.mobile == mobile)
+            var personDataList = await _context.personalDatas.Where(p => p.mobile == mobile)
                 .Select(p => new PersonDataWithFilesDto
                 {
                     Id = p.Id,
@@ -45,6 +45,7 @@ namespace DropSpace.ERPServices.PersonData
                     Latitude = p.latitude,
                     Longitude = p.longitude,
                     createdAt=p.createdAt,
+                    mobileMsk=IdMasking.Encode(mobile),
                     UploadedFiles = new List<UploadedFileDto>()
                 })
                 .ToListAsync();

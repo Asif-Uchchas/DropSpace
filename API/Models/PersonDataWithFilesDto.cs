@@ -3,6 +3,7 @@
     public class PersonDataWithFilesDto
     {
         public int Id { get; set; }
+        public string? mobileMsk { get; set; }
         public string? Name { get; set; }
         public string? Mobile { get; set; }
         public int? UnionId { get; set; }

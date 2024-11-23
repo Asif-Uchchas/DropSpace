@@ -29,11 +29,17 @@
                 <input type="hidden" id="cId" value="@DropSpace.Helpers.IdMasking.Encode("1")"/>
                 <!-- Personal Information Section -->
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">ব্যক্তিগত তথ্য</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">অপরাধের তথ্য ও অবস্থান</h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700">নাম</label>
-                            <input type="text" id="name" name="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার নাম লিখুন">
+                            <label for="name" class="block text-sm font-medium text-gray-700">অপরাধের ধরণ</label>
+                            <select id="type" name="typeId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="" selected>বিভাগ নির্বাচন করুন</option>
+                                @foreach (var item in ViewBag.type)
+                                {
+                                    <option value="@item.Id">@item.crimeTypeNameBn</option>
+                                }
+                            </select>
                         </div>
                         <div>
                             <label for="division" class="block text-sm font-medium text-gray-700">বিভাগ</label>
@@ -128,7 +134,7 @@
 
                 <!-- Submit Button -->
                 <div class="mt-8 text-center">
-                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 hidden" id="submitButton">
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200" id="submitButton">
                         সমস্ত তথ্য জমা দিন
                     </button>
                 </div>
@@ -370,7 +376,8 @@
 
         function validateForm() {
             const isValid = $('#name').val() && $('#division').val() && $('#district').val() && $('#thana').val() && $('#union').val() && $('#village').val() && $('#fileList .flex').length > 0;
-            $('#submitButton').prop('disabled', !isValid);
+            
+            //$('#submitButton').prop('disabled', !isValid);
         }
 
         function sendOTP() {

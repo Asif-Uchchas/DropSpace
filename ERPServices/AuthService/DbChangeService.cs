@@ -6,8 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using DropSpace.Context;
-using DropSpace.Data.Entity.MasterData;
 using DropSpace.ERPServices.AuthService.Interfaces;
+using DropSpace.Data.Entity.LogInfo;
 
 namespace DropSpace.ERPServices.AuthService
 {

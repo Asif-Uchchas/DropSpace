@@ -1,5 +1,5 @@
 ﻿using DropSpace.Context;
-using DropSpace.Contracts;
+using DropSpace.Repository.Contracts;
 
 namespace DropSpace.Repository
 {

@@ -1,5 +1,4 @@
-﻿using DropSpace.Contracts;
-using DropSpace.Data;
+﻿using DropSpace.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
@@ -8,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DropSpace.Context;
+using DropSpace.Repository.Contracts;
 
 namespace DropSpace.Repository
 {

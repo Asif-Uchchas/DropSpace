@@ -1,5 +1,4 @@
 using DropSpace.Context;
-using DropSpace.Contracts;
 using DropSpace.Data.Entity;
 using DropSpace.ERPService.AuthService.Interfaces;
 using DropSpace.ERPServices.AuthService;
@@ -12,6 +11,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DropSpace.Services.Dapper;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using DropSpace.Repository.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,12 +45,28 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserInfoes, UserInfoes>();
 builder.Services.AddScoped<IPersonData, PersonData>();
 builder.Services.AddScoped<IMasterData, MasterDataService>();
-
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 // Add HttpClient and WebHostEnvironment
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
 var app = builder.Build();
-
+#region For Seed Value
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+        var context = services.GetRequiredService<DropSpaceDbContext>();
+        await SeedData.SeedAsync(userManager, roleManager, context);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred during seeding: {ex.Message}");
+    }
+}
+#endregion
 // Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {

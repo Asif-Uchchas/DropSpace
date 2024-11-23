@@ -1,8 +1,8 @@
 ﻿using DropSpace.Areas.Auth.Models;
-using DropSpace.Contracts;
 using DropSpace.Data.Entity;
 using DropSpace.Data.Entity.MasterData;
 using DropSpace.ERPService.AuthService.Interfaces;
+using DropSpace.Repository.Contracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

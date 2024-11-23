@@ -6,6 +6,7 @@
         public string? dId { get; set; }
         public string? tId { get; set; }
         public string? uId { get; set; }
+        public string? mId { get; set; }
     }
     public class CountryViewModel
     {
@@ -36,5 +37,19 @@
     {
         public string? villageNameBn { get; set; }
         public string? Id { get; set; }
+    }
+    public class CrimeTypeViewModel
+    {
+        public string? crimeTypeNameBn { get; set; }
+        public string? Id { get; set; }
+    }
+    public class PersonsDataViewModel
+    {
+        public string? typeId { get; set; }
+        public string? latitude { get; set; }
+        public string? longitude { get; set; }
+        public string? mobile { get; set; }
+        public string? unionId { get; set; }
+        public string? villageId { get; set; }
     }
 }

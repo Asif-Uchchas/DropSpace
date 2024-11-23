@@ -1,6 +1,6 @@
 using DropSpace.Areas.Auth.Models;
-using DropSpace.Contracts;
 using DropSpace.Data.Entity;
+using DropSpace.Repository.Contracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

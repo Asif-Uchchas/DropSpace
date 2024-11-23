@@ -1,5 +1,5 @@
 ﻿
-using DropSpace.Data.Entity.MasterData;
+using DropSpace.Data.Entity.LogInfo;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

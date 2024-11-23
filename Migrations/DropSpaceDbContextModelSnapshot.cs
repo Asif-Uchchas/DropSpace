@@ -101,10 +101,6 @@ namespace DropSpace.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("bpNo")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTime?>("createdAt")
                         .HasColumnType("datetime2");
 
@@ -115,9 +111,15 @@ namespace DropSpace.Migrations
                     b.Property<int?>("isActive")
                         .HasColumnType("int");
 
-                    b.Property<string>("otpCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<int?>("userType")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -181,7 +183,7 @@ namespace DropSpace.Migrations
 
                     b.HasIndex("villageId");
 
-                    b.ToTable("personsDatas");
+                    b.ToTable("personalDatas");
                 });
 
             modelBuilder.Entity("DropSpace.Data.Entity.Droper.UploadedFiles", b =>
@@ -202,6 +204,9 @@ namespace DropSpace.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<int?>("crimeTypeId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("isDelete")
                         .HasColumnType("int");
 
@@ -217,27 +222,20 @@ namespace DropSpace.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("crimeTypeId");
+
                     b.HasIndex("personsDataId");
 
                     b.ToTable("uploadedFiles");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.Country", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.LogInfo.OTPLogs", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("countryCode")
-                        .HasColumnType("NVARCHAR(20)");
-
-                    b.Property<string>("countryName")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("countryNameBn")
-                        .HasColumnType("NVARCHAR(120)");
 
                     b.Property<DateTime?>("createdAt")
                         .HasColumnType("datetime2");
@@ -246,23 +244,17 @@ namespace DropSpace.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("isActive")
-                        .HasColumnType("NVARCHAR(10)");
-
                     b.Property<int?>("isDelete")
                         .HasColumnType("int");
 
-                    b.Property<string>("latitude")
-                        .HasColumnType("NVARCHAR(120)");
+                    b.Property<bool>("isVerified")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("longitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("nationality")
+                    b.Property<string>("otp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("shortName")
-                        .HasColumnType("NVARCHAR(20)");
+                    b.Property<DateTime?>("otpExpire")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("updatedAt")
                         .HasColumnType("datetime2");
@@ -271,348 +263,15 @@ namespace DropSpace.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("Countries");
-                });
-
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.District", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("createdAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("createdBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("districtCode")
-                        .HasColumnType("NVARCHAR(20)");
-
-                    b.Property<string>("districtName")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("districtNameBn")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<int>("divisionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("isActive")
-                        .HasColumnType("NVARCHAR(10)");
-
-                    b.Property<int?>("isDelete")
-                        .HasColumnType("int");
-
-                    b.Property<string>("latitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("longitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("shortName")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<DateTime?>("updatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("updatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("divisionId");
-
-                    b.ToTable("Districts");
-                });
-
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.Division", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("countryId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("createdAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("createdBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("divisionCode")
-                        .HasColumnType("NVARCHAR(20)");
-
-                    b.Property<string>("divisionName")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("divisionNameBn")
+                    b.Property<string>("userName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("isActive")
-                        .HasColumnType("NVARCHAR(10)");
-
-                    b.Property<int?>("isDelete")
-                        .HasColumnType("int");
-
-                    b.Property<string>("latitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("longitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("shortName")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<DateTime?>("updatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("updatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("countryId");
-
-                    b.ToTable("Divisions");
+                    b.ToTable("oTPLogs");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PostOffice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("createdAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("createdBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int?>("isDelete")
-                        .HasColumnType("int");
-
-                    b.Property<string>("postalCode")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("postalName")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("postalNameBn")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("postalShortName")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("thanaId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("updatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("updatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("thanaId");
-
-                    b.ToTable("postOffices");
-                });
-
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.RangeMetro", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("createdAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("createdBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("isActive")
-                        .HasColumnType("NVARCHAR(10)");
-
-                    b.Property<int?>("isDelete")
-                        .HasColumnType("int");
-
-                    b.Property<string>("latitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("longitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<int?>("pimsRangeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("pimsRangeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("rangeMetroName")
-                        .HasColumnType("NVARCHAR(350)");
-
-                    b.Property<string>("rangeMetroNameBn")
-                        .HasColumnType("NVARCHAR(350)");
-
-                    b.Property<DateTime?>("updatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("updatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RangeMetros");
-                });
-
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.Thana", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("createdAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("createdBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int?>("districtId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("isActive")
-                        .HasColumnType("NVARCHAR(10)");
-
-                    b.Property<int?>("isDelete")
-                        .HasColumnType("int");
-
-                    b.Property<string>("latitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("longitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<int?>("rangeMetroId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("shortName")
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.Property<string>("thanaCode")
-                        .HasColumnType("NVARCHAR(20)");
-
-                    b.Property<string>("thanaName")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("thanaNameBn")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<DateTime?>("updatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("updatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("districtId");
-
-                    b.HasIndex("rangeMetroId");
-
-                    b.ToTable("Thanas");
-                });
-
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.UnionWard", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("createdAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("createdBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<int?>("districtsId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("isActive")
-                        .HasColumnType("NVARCHAR(10)");
-
-                    b.Property<int?>("isDelete")
-                        .HasColumnType("int");
-
-                    b.Property<string>("latitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("longitude")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("shortName")
-                        .HasColumnType("NVARCHAR(50)");
-
-                    b.Property<int>("thanaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("unionCode")
-                        .HasColumnType("NVARCHAR(20)");
-
-                    b.Property<string>("unionName")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<string>("unionNameBn")
-                        .HasColumnType("NVARCHAR(120)");
-
-                    b.Property<DateTime?>("updatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("updatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("districtsId");
-
-                    b.HasIndex("thanaId");
-
-                    b.ToTable("UnionWards");
-                });
-
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.UserLogHistory", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.LogInfo.UserLogHistory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -697,7 +356,7 @@ namespace DropSpace.Migrations
                     b.ToTable("UserLogHistories");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.Village", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.CrimeInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -712,7 +371,433 @@ namespace DropSpace.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<int?>("districtsId")
+                    b.Property<string>("crimeType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("isActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("crimeInfos");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("divisionDistrictName")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.Property<string>("divisionDistrictNameBn")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<int?>("rangeMetroId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("rangeMetroId");
+
+                    b.ToTable("divisionDistricts");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.PoliceThana", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("divisionDistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("fariType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isChild")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("isReportable")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<int?>("policeThanaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("policeThanaName")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.Property<string>("policeThanaNameBn")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.Property<int?>("rangeMetroId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("upazillaId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("zoneCircleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("divisionDistrictId");
+
+                    b.HasIndex("policeThanaId");
+
+                    b.HasIndex("rangeMetroId");
+
+                    b.HasIndex("upazillaId");
+
+                    b.HasIndex("zoneCircleId");
+
+                    b.ToTable("policeThanas");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.RangeMetro", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("rangeMetroName")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.Property<string>("rangeMetroNameBn")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("rangeMetros");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.ZoneCircle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("divisionDistrictId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("zoneName")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.Property<string>("zoneNameBn")
+                        .HasColumnType("NVARCHAR(350)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("divisionDistrictId");
+
+                    b.ToTable("zoneCircles");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("countryCode")
+                        .HasColumnType("NVARCHAR(20)");
+
+                    b.Property<string>("countryName")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("countryNameBn")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("shortName")
+                        .HasColumnType("NVARCHAR(20)");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("countries");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.District", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("districtCode")
+                        .HasColumnType("NVARCHAR(20)");
+
+                    b.Property<string>("districtName")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("districtNameBn")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<int>("divisionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("shortName")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("divisionId");
+
+                    b.ToTable("districts");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Division", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("countryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("divisionCode")
+                        .HasColumnType("NVARCHAR(20)");
+
+                    b.Property<string>("divisionName")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("divisionNameBn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("shortName")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("countryId");
+
+                    b.ToTable("divisions");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("districtId")
                         .HasColumnType("int");
 
                     b.Property<string>("isActive")
@@ -730,8 +815,114 @@ namespace DropSpace.Migrations
                     b.Property<string>("shortName")
                         .HasColumnType("NVARCHAR(50)");
 
-                    b.Property<int?>("thanaId")
+                    b.Property<string>("thanaCode")
+                        .HasColumnType("NVARCHAR(20)");
+
+                    b.Property<string>("thanaName")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("thanaNameBn")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("districtId");
+
+                    b.ToTable("thanas");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("shortName")
+                        .HasColumnType("NVARCHAR(50)");
+
+                    b.Property<int>("thanaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("unionCode")
+                        .HasColumnType("NVARCHAR(20)");
+
+                    b.Property<string>("unionName")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("unionNameBn")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("thanaId");
+
+                    b.ToTable("unionWards");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Village", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("isActive")
+                        .HasColumnType("NVARCHAR(10)");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<string>("latitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("longitude")
+                        .HasColumnType("NVARCHAR(120)");
+
+                    b.Property<string>("shortName")
+                        .HasColumnType("NVARCHAR(50)");
 
                     b.Property<int>("unionWardId")
                         .HasColumnType("int");
@@ -754,13 +945,46 @@ namespace DropSpace.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("districtsId");
-
-                    b.HasIndex("thanaId");
-
                     b.HasIndex("unionWardId");
 
-                    b.ToTable("Villages");
+                    b.ToTable("villages");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.UserType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("createdAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("createdBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<bool?>("isActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("isDelete")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("updatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("updatedBy")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("userTypeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("userTypes");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -871,11 +1095,11 @@ namespace DropSpace.Migrations
 
             modelBuilder.Entity("DropSpace.Data.Entity.Droper.PersonsData", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.UnionWard", "union")
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", "union")
                         .WithMany()
                         .HasForeignKey("unionId");
 
-                    b.HasOne("DropSpace.Data.Entity.MasterData.Village", "village")
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Village", "village")
                         .WithMany()
                         .HasForeignKey("villageId");
 
@@ -886,16 +1110,73 @@ namespace DropSpace.Migrations
 
             modelBuilder.Entity("DropSpace.Data.Entity.Droper.UploadedFiles", b =>
                 {
+                    b.HasOne("DropSpace.Data.Entity.MasterData.CrimeInfo", "crimeType")
+                        .WithMany()
+                        .HasForeignKey("crimeTypeId");
+
                     b.HasOne("DropSpace.Data.Entity.Droper.PersonsData", "personsData")
                         .WithMany()
                         .HasForeignKey("personsDataId");
 
+                    b.Navigation("crimeType");
+
                     b.Navigation("personsData");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.District", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.Division", "division")
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.RangeMetro", "rangeMetro")
+                        .WithMany()
+                        .HasForeignKey("rangeMetroId");
+
+                    b.Navigation("rangeMetro");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.PoliceThana", b =>
+                {
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", "divisionDistrict")
+                        .WithMany()
+                        .HasForeignKey("divisionDistrictId");
+
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.PoliceThana", "policeThana")
+                        .WithMany()
+                        .HasForeignKey("policeThanaId");
+
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.RangeMetro", "rangeMetro")
+                        .WithMany()
+                        .HasForeignKey("rangeMetroId");
+
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", "upazilla")
+                        .WithMany()
+                        .HasForeignKey("upazillaId");
+
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.ZoneCircle", "zoneCircle")
+                        .WithMany()
+                        .HasForeignKey("zoneCircleId");
+
+                    b.Navigation("divisionDistrict");
+
+                    b.Navigation("policeThana");
+
+                    b.Navigation("rangeMetro");
+
+                    b.Navigation("upazilla");
+
+                    b.Navigation("zoneCircle");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.ZoneCircle", b =>
+                {
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", "divisionDistrict")
+                        .WithMany()
+                        .HasForeignKey("divisionDistrictId");
+
+                    b.Navigation("divisionDistrict");
+                });
+
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.District", b =>
+                {
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Division", "division")
                         .WithMany()
                         .HasForeignKey("divisionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -904,77 +1185,46 @@ namespace DropSpace.Migrations
                     b.Navigation("division");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.Division", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Division", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.Country", "country")
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Country", "country")
                         .WithMany()
-                        .HasForeignKey("countryId");
+                        .HasForeignKey("countryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("country");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PostOffice", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.Thana", "thana")
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.District", "district")
                         .WithMany()
-                        .HasForeignKey("thanaId")
+                        .HasForeignKey("districtId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("thana");
-                });
-
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.Thana", b =>
-                {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.District", "district")
-                        .WithMany()
-                        .HasForeignKey("districtId");
-
-                    b.HasOne("DropSpace.Data.Entity.MasterData.RangeMetro", "rangeMetro")
-                        .WithMany()
-                        .HasForeignKey("rangeMetroId");
 
                     b.Navigation("district");
-
-                    b.Navigation("rangeMetro");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.UnionWard", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.District", "districts")
-                        .WithMany()
-                        .HasForeignKey("districtsId");
-
-                    b.HasOne("DropSpace.Data.Entity.MasterData.Thana", "thana")
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", "thana")
                         .WithMany()
                         .HasForeignKey("thanaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("districts");
-
                     b.Navigation("thana");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.Village", b =>
+            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Village", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.District", "districts")
-                        .WithMany()
-                        .HasForeignKey("districtsId");
-
-                    b.HasOne("DropSpace.Data.Entity.MasterData.Thana", "thana")
-                        .WithMany()
-                        .HasForeignKey("thanaId");
-
-                    b.HasOne("DropSpace.Data.Entity.MasterData.UnionWard", "unionWard")
+                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", "unionWard")
                         .WithMany()
                         .HasForeignKey("unionWardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("districts");
-
-                    b.Navigation("thana");
 
                     b.Navigation("unionWard");
                 });

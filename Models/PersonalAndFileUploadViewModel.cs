@@ -1,4 +1,4 @@
-﻿using DropSpace.Data.Entity.MasterData;
+﻿using DropSpace.Data.Entity.MasterData.PublicMapping;
 
 namespace DropSpace.Models
 {

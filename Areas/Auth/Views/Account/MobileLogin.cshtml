@@ -13,7 +13,7 @@
             <h1 class="text-2xl font-bold text-gray-900 mb-4">মোবাইল যাচাই</h1>
             <p class="text-gray-600">আপনার মোবাইল নম্বর দিয়ে যাচাই করুন</p>
         </div>
-
+        <form method="post"></form>
         <div class="space-y-4">
             <div>
                 @* <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label> *@
@@ -58,6 +58,7 @@
 
 @section Scripts {
     <script>
+        var token = $('input[name="__RequestVerificationToken"]').val();
         $(document).ready(function () {
             $('#sendOTPButton').click(sendOTP);
             $('#verifyOTPButton').click(verifyOTP);
@@ -197,18 +198,20 @@
         }
 
         function proceedToNextStep() {
-            const mobileNumber = $('#mobileNumber').val();
-
+            var data = {mId: $('#mobileNumber').val() };
             $.ajax({
-                url: `/api/FileUpload/GetPersonDataByMobile?mobile=${mobileNumber}`,
+                url: `/api/Home/Media/GetPersonDataByMobile`,
                 type: 'POST',
+                data: JSON.stringify(data),
+                processData: false,
+                contentType: 'application/json',
+                headers: {
+                    'RequestVerificationToken': token
+                },
                 success: function (response) {
-                    
                     if (response && Object.keys(response).length > 0) {
-
-                        window.location.href = `/Home/Media?mobile=${mobileNumber}`;
-                    } else {
-                        
+                        window.location.href = `/Home/Media/Index?mobile=${response[0].mobileMsk}`;
+                    } else {                        
                         Swal.fire({
                             icon: 'info',
                             title: 'কোন ডেটা নেই',

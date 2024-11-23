@@ -6,6 +6,7 @@ using DropSpace.ERPServices.PersonData;
 using DropSpace.ERPServices.PersonData.Interfaces;
 using DropSpace.Helpers;
 using DropSpace.Models;
+using DropSpace.Repository.Contracts;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -19,31 +20,57 @@ namespace DropSpace.Areas.Home.Controllers
         private readonly IPersonData _persondata;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMasterData _masterdata;
+        private readonly IGenericRepository<CrimeInfo> _repoCrimeInfo;
 
-        public HomeController(IPersonData persondata, IMasterData masterData, IWebHostEnvironment webHostEnvironment)
+        public HomeController(IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment)
         {
             _persondata = persondata;
             _webHostEnvironment = webHostEnvironment;
             _masterdata = masterData;
+            _repoCrimeInfo = repoCrimeInfo;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-
+            var crimeType = await _repoCrimeInfo.FindAll();
+            ViewBag.type = crimeType.Select(x => new CrimeTypeViewModel
+            {
+                Id = IdMasking.Encode(x.Id.ToString()),
+                crimeTypeNameBn=x.crimeType
+            });
             return View();
         }
 
         [HttpPost]
         [RequestSizeLimit(2147483648)] // 2GB limit
-        public async Task<IActionResult> Index([FromForm] PersonsData personsData, [FromForm] IFormFileCollection files)
+        public async Task<IActionResult> Index([FromForm] PersonsDataViewModel personsData, [FromForm] IFormFileCollection files)
         {
-            if ((string.IsNullOrWhiteSpace(personsData?.name) || string.IsNullOrWhiteSpace(personsData?.mobile)) && (files == null || files.Count == 0))
+            if (string.IsNullOrWhiteSpace(personsData?.typeId) && (files == null || files.Count == 0))
             {
                 ViewBag.MessageType = "error";
                 ViewBag.Message = "invalid_input";
                 return View();
             }
-
-            int personsDataId = await _persondata.AddPersonsDataAsync(personsData);
+            int crimeType = Convert.ToInt32(IdMasking.Decode(personsData?.typeId));
+            int? unionId=null;
+            int? villageId = null;
+            if (personsData?.unionId!=null && personsData?.unionId != "")
+            {
+                unionId = Convert.ToInt32(IdMasking.Decode(personsData?.unionId));
+            }
+            if (personsData?.villageId != null && personsData?.villageId != "")
+            {
+                villageId = Convert.ToInt32(IdMasking.Decode(personsData?.villageId));
+            }
+            var personalData = new PersonsData
+            {
+                latitude = personsData.latitude,
+                longitude = personsData.longitude,
+                mobile = personsData.mobile,
+                unionId= unionId,
+                villageId = villageId,
+                
+            };
+            int personsDataId = await _persondata.AddPersonsDataAsync(personalData);
 
             if (files != null && files.Count > 0)
             {
@@ -69,6 +96,7 @@ namespace DropSpace.Areas.Home.Controllers
                         uploadedFilesList.Add(new UploadedFiles
                         {
                             personsDataId = personsDataId,
+                            crimeTypeId=crimeType,
                             attachmentUrl = Path.Combine("ufile", file.FileName)
                         });
                     }
@@ -95,7 +123,12 @@ namespace DropSpace.Areas.Home.Controllers
                 ViewBag.MessageType = "success";
                 ViewBag.Message = "persons_data_saved_no_files";
             }
-
+            var crimeTypes = await _repoCrimeInfo.FindAll();
+            ViewBag.type = crimeTypes.Select(x => new CrimeTypeViewModel
+            {
+                Id = IdMasking.Encode(x.Id.ToString()),
+                crimeTypeNameBn = x.crimeType
+            });
             return View();
         }
 

@@ -4,27 +4,21 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
 using System.Net.Http;
 using System.Text.Json;
+using DropSpace.ERPServices.PersonData.Interfaces;
+using DropSpace.Helpers;
 
 namespace DropSpace.Areas.Home.Controllers
 {
     [Area("Home")]
     public class MediaController : Controller
     {
-        private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ILogger<MediaController> _logger;
+        private readonly IPersonData _persondata;
 
-        public MediaController(
-            HttpClient httpClient,
-            IConfiguration configuration,
-            IWebHostEnvironment webHostEnvironment,
-            ILogger<MediaController> logger)
+        public MediaController(IPersonData persondata,IWebHostEnvironment webHostEnvironment)
         {
-            _httpClient = httpClient;
-            _configuration = configuration;
+            _persondata = persondata;
             _webHostEnvironment = webHostEnvironment;
-            _logger = logger;
         }
 
         public async Task<IActionResult> Index(string mobile)
@@ -36,67 +30,42 @@ namespace DropSpace.Areas.Home.Controllers
 
             if (!string.IsNullOrWhiteSpace(mobile))
             {
-                try
+                var personData = await _persondata.GetPersonDataWithFilesByMobileAsync(IdMasking.Decode(mobile));
+                foreach (var item0 in personData)
                 {
-                    var baseUrl = _configuration["API:baseUrl"];
-                    var apiUrl = $"{baseUrl}/api/FileUpload/GetPersonDataByMobile?mobile={mobile}";
-
-                    // Remove custom handler, use default HttpClient
-                    var response = await _httpClient.PostAsync(apiUrl, null);
-
-                    if (response.IsSuccessStatusCode)
+                    foreach (var item1 in item0.UploadedFiles)
                     {
-                        var responseContent = await response.Content.ReadAsStringAsync();
-                        var data = JsonSerializer.Deserialize<List<JsonElement>>(responseContent);
 
-                        if (data != null)
+                        var serverPath = Path.Combine(_webHostEnvironment.WebRootPath, item1.AttachmentUrl);
+
+                        // Validate file exists
+                        if (System.IO.File.Exists(serverPath))
                         {
-                            foreach (var person in data)
+                            model.Files.Add(new MediaFileViewModel
                             {
-                                if (person.TryGetProperty("uploadedFiles", out var filesArray))
-                                {
-                                    foreach (var file in filesArray.EnumerateArray())
-                                    {
-                                        var url = file.GetProperty("attachmentUrl").GetString();
-                                        var fileName = Path.GetFileName(url);
-                                        var serverPath = Path.Combine(_webHostEnvironment.WebRootPath, "ufile", fileName);
-
-                                        // Validate file exists
-                                        if (System.IO.File.Exists(serverPath))
-                                        {
-                                            model.Files.Add(new MediaFileViewModel
-                                            {
-                                                // Use a web-accessible path
-                                                Url = $"/ufile/{fileName}",
-                                                FileType = GetFileType(fileName)
-                                            });
-                                        }
-                                        else
-                                        {
-                                            _logger.LogWarning($"File not found: {serverPath}");
-                                        }
-                                    }
-                                }
-                            }
+                                // Use a web-accessible path
+                                Url = $"/{item1.AttachmentUrl}",
+                                FileType = GetFileType(item1.AttachmentUrl)
+                            });
                         }
                     }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        _logger.LogError($"API request failed. Status: {response.StatusCode}. Error: {errorContent}");
-                        ModelState.AddModelError(string.Empty, $"Failed to retrieve data. Status: {response.StatusCode}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An error occurred while fetching media files");
-                    ModelState.AddModelError(string.Empty, $"An error occurred: {ex.Message}");
                 }
             }
 
             return View(model);
         }
-
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetPersonDataByMobile([FromBody] MasterDataViewModel model)
+        {
+            var personData = await _persondata.GetPersonDataWithFilesByMobileAsync(model.mId);
+            if (personData == null)
+            {
+                return NotFound(new { message = "No person data found for the provided mobile number." });
+            }
+            return Json(personData);
+        }
         private string GetFileType(string url)
         {
             if (string.IsNullOrEmpty(url)) return "other";
