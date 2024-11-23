@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Auth\Data\**" />
+    <Compile Remove="Areas\Home\Data\**" />
+    <Compile Remove="Controllers\**" />
+    <Content Remove="Areas\Auth\Data\**" />
+    <Content Remove="Areas\Home\Data\**" />
+    <Content Remove="Controllers\**" />
+    <EmbeddedResource Remove="Areas\Auth\Data\**" />
+    <EmbeddedResource Remove="Areas\Home\Data\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <None Remove="Areas\Auth\Data\**" />
+    <None Remove="Areas\Home\Data\**" />
+    <None Remove="Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="DinkToPdf" Version="1.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
@@ -31,10 +46,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Auth\Controllers\" />
-    <Folder Include="Areas\Auth\Data\" />
     <Folder Include="Areas\Auth\Models\" />
-    <Folder Include="Areas\Home\Data\" />
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

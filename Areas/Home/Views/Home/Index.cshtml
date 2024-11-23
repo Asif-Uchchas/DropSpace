@@ -25,12 +25,8 @@
         </div>
 
         <div class="mt-8 max-w-full sm:max-w-2xl mx-auto">
-            <form id="uploadForm"
-                  action="@Url.Action("Index", "Home", new { area = "Home" })" 
-                  method="POST"
-                  enctype="multipart/form-data"
-                  class="relative">
-
+            <form id="uploadForm" asp-action="Index" asp-controller="Home" asp-area="Home" method="POST" enctype="multipart/form-data" class="relative">
+                <input type="hidden" id="cId" value="@DropSpace.Helpers.IdMasking.Encode("1")"/>
                 <!-- Personal Information Section -->
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">ব্যক্তিগত তথ্য</h2>
@@ -143,8 +139,7 @@
 
 @section Scripts {
     <script>
-        // const API_BASE_URL = '@Configuration["API:baseUrl"]';
-
+        var token = $('input[name="__RequestVerificationToken"]').val();
         $(document).ready(function () {
             // Initialize location detection
             if (navigator.geolocation) {
@@ -212,11 +207,17 @@
             $('#uploadForm').submit(validateAndSubmit);
         });
 
-
         function loadDivisions() {
+            var data = { cId: $('#cId').val() };
             $.ajax({
-                url: `/api/MasterData/GetDivisionByCountryId?cId=1`,
+                url: `/api/Home/Home/GetDivisionByCountryId`,
                 type: 'POST',
+                data: JSON.stringify(data),
+                processData: false,
+                contentType: 'application/json',
+                headers: {
+                    'RequestVerificationToken': token
+                },
                 success: function (data) {
                     populateDropdown('#division', data, 'divisionNameBn', 'id');
                     resetDependentDropdowns(['#district', '#thana', '#union', '#village']);
@@ -230,10 +231,16 @@
         function loadDistricts() {
             const divisionId = $('#division').val();
             if (!divisionId) return;
-
+            var data = { dId: divisionId };
             $.ajax({
-                url: `/api/MasterData/GetDistrictByDivisionId?dId=${divisionId}`,
+                url: `/api/Home/Home/GetDistrictByDivisionId`,
                 type: 'POST',
+                data: JSON.stringify(data),
+                processData: false,
+                contentType: 'application/json',
+                headers: {
+                    'RequestVerificationToken': token
+                },
                 success: function (data) {
                     populateDropdown('#district', data, 'districtNameBn', 'id');
                     resetDependentDropdowns(['#thana', '#union', '#village']);
@@ -247,12 +254,18 @@
         function loadThanas() {
             const districtId = $('#district').val();
             if (!districtId) return;
-
+            var data = { dId: districtId };
             $.ajax({
-                url: `/api/MasterData/GetThanaByDistrictId?dId=${districtId}`,
+                url: `/api/Home/Home/GetActiveThanaByDistrictId`,
                 type: 'POST',
+                data: JSON.stringify(data),
+                processData: false,
+                contentType: 'application/json',
+                headers: {
+                    'RequestVerificationToken': token
+                },
                 success: function (data) {
-                    populateDropdown('#thana', data, 'thanaNameBn', 'id');
+                    populateDropdown('#thana', data, 'policeThanaNameBn', 'id');
                     resetDependentDropdowns(['#union', '#village']);
                 },
                 error: function () {
@@ -264,12 +277,18 @@
         function loadUnions() {
             const thanaId = $('#thana').val();
             if (!thanaId) return;
-
+            var data = { tId: thanaId };
             $.ajax({
-                url: `/api/MasterData/GetUnionWardsByThanaId?tId=${thanaId}`,
+                url: `/api/Home/Home/GetActiveUnionWardsByThanaId`,
                 type: 'POST',
+                data: JSON.stringify(data),
+                processData: false,
+                contentType: 'application/json',
+                headers: {
+                    'RequestVerificationToken': token
+                },
                 success: function (data) {
-                    populateDropdown('#union', data, 'unionNameBn', 'id');
+                    populateDropdown('#union', data, 'unionWordNameBn', 'id');
                     resetDependentDropdowns(['#village']);
                 },
                 error: function () {
@@ -281,10 +300,17 @@
         function loadVillages() {
             const unionId = $('#union').val();
             if (!unionId) return;
+            var data = { uId: unionId };
 
             $.ajax({
-                url: `/api/MasterData/GetAllVillageByUnionId?uId=${unionId}`,
+                url: `/api/Home/Home/GetAllActiveVillageByUnionId`,
                 type: 'POST',
+                data: JSON.stringify(data),
+                processData: false,
+                contentType: 'application/json',
+                headers: {
+                    'RequestVerificationToken': token
+                },
                 success: function (data) {
                     populateDropdown('#village', data, 'villageNameBn', 'id');
                 },
@@ -319,8 +345,6 @@
             });
             validateForm();
         }
-
-
 
         function handleFiles(event) {
             const files = event.target.files;
@@ -466,8 +490,6 @@
                 e.preventDefault();
             }
         });
-
-        
 
         function validateAndSubmit(event) {
             event.preventDefault();

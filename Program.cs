@@ -11,6 +11,7 @@ using DropSpace.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using DropSpace.Services.Dapper;
+using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,7 +47,6 @@ builder.Services.AddScoped<IMasterData, MasterDataService>();
 // Add HttpClient and WebHostEnvironment
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -70,6 +70,6 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=Home}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,33 +1,36 @@
-﻿using DropSpace.Data.Entity.Droper;
+﻿using DropSpace.Areas.Home.Models;
+using DropSpace.Data.Entity.Droper;
+using DropSpace.Data.Entity.MasterData;
+using DropSpace.ERPServices.MasterData.Interfaces;
 using DropSpace.ERPServices.PersonData;
 using DropSpace.ERPServices.PersonData.Interfaces;
+using DropSpace.Helpers;
 using DropSpace.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DropSpace.Areas.Home.Controllers
 {
+    [Area("Home")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IPersonData _persondata;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IMasterData _masterdata;
 
-        public HomeController(ILogger<HomeController> logger, IPersonData persondata, IWebHostEnvironment webHostEnvironment)
+        public HomeController(IPersonData persondata, IMasterData masterData, IWebHostEnvironment webHostEnvironment)
         {
-            _logger = logger;
             _persondata = persondata;
             _webHostEnvironment = webHostEnvironment;
+            _masterdata = masterData;
         }
-
         public IActionResult Index()
         {
 
             return View();
         }
-
-
 
         [HttpPost]
         [RequestSizeLimit(2147483648)] // 2GB limit
@@ -97,6 +100,123 @@ namespace DropSpace.Areas.Home.Controllers
         }
 
 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetAllCountries()
+        {
+            var data= await _masterdata.GetAllCountries();
+            return Json(data.Select(x => new CountryViewModel
+            {
+                countryNameBn = x.countryNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetDivisionByCountryId([FromBody] MasterDataViewModel model)
+        {
+            var data = await _masterdata.GetDivisionsByCountryId(Convert.ToInt32(IdMasking.Decode(model.cId)));
+            return Json(data.Select(x => new DivisionViewModel
+            {
+                divisionNameBn = x.divisionNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetDistrictByDivisionId([FromBody] MasterDataViewModel model)
+        {
+            var data = await _masterdata.GetDistrictsByDivisonId(Convert.ToInt32(IdMasking.Decode(model.dId)));
+            return Json(data.Select(x => new DistrictViewModel
+            {
+                districtNameBn = x.districtNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetThanaByDistrictId([FromBody] MasterDataViewModel model)
+        {
+            var data = await _masterdata.GetThanasByDistrictId(Convert.ToInt32(IdMasking.Decode(model.dId)));
+            return Json(data.Select(x => new PoliceStationViewModel
+            {
+                policeThanaNameBn = x.thanaNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetActiveThanaByDistrictId([FromBody] MasterDataViewModel model)
+        {
+            var data = await _masterdata.GetActiveThanasByDistrictId(Convert.ToInt32(IdMasking.Decode(model.dId)));
+            return Json(data.Select(x => new PoliceStationViewModel
+            {
+                policeThanaNameBn = x.thanaNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetUnionWardsByThanaId([FromBody] MasterDataViewModel model)
+        {
+            var data = await _masterdata.GetUnionWardsByThanaId(Convert.ToInt32(IdMasking.Decode(model.tId)));
+            return Json(data.Select(x => new UnionWordViewModel
+            {
+                unionWordNameBn = x.unionNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetActiveUnionWardsByThanaId([FromBody] MasterDataViewModel model)
+        {
+            var data = await _masterdata.GetActiveUnionWardsByThanaId(Convert.ToInt32(IdMasking.Decode(model.tId)));
+            return Json(data.Select(x => new UnionWordViewModel
+            {
+                unionWordNameBn = x.unionNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetAllVillageByUnionId([FromBody] MasterDataViewModel model)
+        {
+            var data = await _masterdata.GetAllVillageByUnionId(Convert.ToInt32(IdMasking.Decode(model.uId)));
+            return Json(data.Select(x => new VillageViewModel
+            {
+                villageNameBn = x.villageNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetAllActiveVillageByUnionId([FromBody] MasterDataViewModel model)
+        {
+            var data= await _masterdata.GetAllActiveVillageByUnionId(Convert.ToInt32(IdMasking.Decode(model.uId)));
+            return Json(data.Select(x => new VillageViewModel
+            {
+                villageNameBn = x.villageNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
         public IActionResult Privacy()
         {
             return View();

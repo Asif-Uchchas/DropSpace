@@ -15,8 +15,7 @@ namespace DropSpace.ERPServices.MasterData
         }
         public async Task<IEnumerable<Country>> GetAllCountries()
         {
-            var data = await _context.Countries.ToListAsync();
-            return data;
+            return await _context.Countries.ToListAsync();
         }
         public async Task<IEnumerable<Division>> GetDivisionsByCountryId(int CntId)
         {
@@ -36,16 +35,12 @@ namespace DropSpace.ERPServices.MasterData
         }
         public async Task<IEnumerable<UnionWard>> GetUnionWardsByThanaId(int thanaId)
         {
-
-            var data = await _context.UnionWards.Where(X => X.thanaId == thanaId).ToListAsync();
-            return data;
+            return await _context.UnionWards.Where(X => X.thanaId == thanaId).ToListAsync();
         }
 
         public async Task<IEnumerable<UnionWard>> GetActiveUnionWardsByThanaId(int thanaId)
         {
-
-            var data = await _context.UnionWards.Include(a => a.thana.district.division).Where(X => X.thanaId == thanaId && X.isActive != "Inactive").ToListAsync();
-            return data;
+            return await _context.UnionWards.Include(a => a.thana.district.division).Where(X => X.thanaId == thanaId && X.isActive != "Inactive").ToListAsync();
         }
         public async Task<IEnumerable<Village>> GetAllVillageByUnionId(int id)
         {
