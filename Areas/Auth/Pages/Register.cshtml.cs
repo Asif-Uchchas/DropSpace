@@ -13,16 +13,14 @@ namespace DropSpace.Areas.Auth.Pages
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<LoginModel> _logger;
 
         public RegisterModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager
-            ,IUnitOfWork unitOfWork,  ILogger<LoginModel> logger)
+            ,  ILogger<LoginModel> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
-            _unitOfWork = unitOfWork;
     
             _logger = logger;
             //this.authViewModel = authViewModel;

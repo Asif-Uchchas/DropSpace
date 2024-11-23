@@ -1,4 +1,4 @@
-﻿namespace DropSpace.API.Models
+﻿namespace DropSpace.Areas.Home.Models
 {
     public class PersonDataWithFilesDto
     {

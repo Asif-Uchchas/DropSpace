@@ -252,7 +252,7 @@
             </button>
 
             
-            <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+            <a class="navbar-brand d-flex align-items-center" asp-area="Home" asp-controller="Home" asp-action="Index">
                 <i class="fas fa-cloud-upload-alt me-2"></i>
                 DropSpace
             </a>
@@ -279,7 +279,11 @@
 
                 <!-- Profile -->
                 <div class="dropdown">
-                    <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
+                    <a class="btn btn-link text-dark d-flex align-items-center" href="/Home/Home/Index">
+                        <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
+                        <span class="fw-bold">Username</span>
+                    </a>
+                    @* <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
                         <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
                         <span class="fw-bold">Username</span>
                     </button>
@@ -288,7 +292,7 @@
                         <a class="dropdown-item" href="/settings">Settings</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item text-danger" href="/logout">Logout</a>
-                    </div>
+                    </div> *@
                 </div>
             </div>
         </div>
@@ -304,10 +308,10 @@
         <div class="col-md-2 col-sm-4 d-none d-sm-block">
             <nav class="sidebar" id="sidebar">
                 <div class="py-3">
-                    <a href="#" class="sidebar-link active">
+                    <a href="/Home/Media/Index?mobile=@ViewBag.userName" class="sidebar-link active">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
-                    <a href="/Home/Index" class="sidebar-link">
+                    <a href="/Home/Home/Index?userName=@ViewBag.userName" id="upload" class="sidebar-link">
                         <i class="fas fa-upload"></i> Upload Files
                     </a>
                     @* <a href="#" class="sidebar-link">

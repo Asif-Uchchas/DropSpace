@@ -112,7 +112,7 @@
             }
 
             $.ajax({
-                url: '/api/sendOTP',
+                url: '/api/Auth/Account/sendOTP',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ mobileNumber }),
@@ -148,7 +148,7 @@
             const mobileNumber = $('#mobileNumber').val();
 
             $.ajax({
-                url: '/api/verifyOTP',
+                url: '/api/Auth/Account/verifyOTP',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ mobileNumber, otp }),

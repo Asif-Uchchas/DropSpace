@@ -1,4 +1,4 @@
-﻿using DropSpace.API.Models;
+﻿using DropSpace.Areas.Home.Models;
 using DropSpace.Context;
 using DropSpace.Data.Entity.Droper;
 using DropSpace.ERPServices.PersonData.Interfaces;

@@ -23,6 +23,7 @@ namespace DropSpace.Areas.Home.Controllers
 
         public async Task<IActionResult> Index(string mobile)
         {
+            ViewBag.userName=mobile;
             var model = new MediaViewModel
             {
                 Files = new List<MediaFileViewModel>()

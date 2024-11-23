@@ -29,8 +29,9 @@ namespace DropSpace.Areas.Home.Controllers
             _masterdata = masterData;
             _repoCrimeInfo = repoCrimeInfo;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? userName)
         {
+            ViewBag.userName = userName;
             var crimeType = await _repoCrimeInfo.FindAll();
             ViewBag.type = crimeType.Select(x => new CrimeTypeViewModel
             {
@@ -122,6 +123,10 @@ namespace DropSpace.Areas.Home.Controllers
             {
                 ViewBag.MessageType = "success";
                 ViewBag.Message = "persons_data_saved_no_files";
+            }
+            if (personsData.mobile != null && personsData.mobile != "")
+            {
+                ViewBag.userName = IdMasking.Encode(personsData.mobile);
             }
             var crimeTypes = await _repoCrimeInfo.FindAll();
             ViewBag.type = crimeTypes.Select(x => new CrimeTypeViewModel

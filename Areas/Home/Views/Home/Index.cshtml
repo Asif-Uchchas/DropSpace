@@ -1,7 +1,6 @@
-﻿@model List<IFormFile>
-@{
+﻿@{
     ViewData["Title"] = "Register";
-    if (User.Identity.Name != null)
+    if (ViewBag.userName != null)
     {
         Layout = "~/Views/Shared/_layout.cshtml";
     }
@@ -10,7 +9,6 @@
         Layout = "~/Views/Shared/_layoutPublic.cshtml";
     }
 }
-@inject IConfiguration Configuration
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -147,7 +145,10 @@
     <script>
         var token = $('input[name="__RequestVerificationToken"]').val();
         $(document).ready(function () {
-            // Initialize location detection
+            if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName'!='null') {
+                $('.active').removeClass('active');
+                $('#upload').addClass('active');
+            }
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     $('#latitude').val(position.coords.latitude);
@@ -225,7 +226,7 @@
                     'RequestVerificationToken': token
                 },
                 success: function (data) {
-                    populateDropdown('#division', data, 'divisionNameBn', 'id');
+                    populateDropdown('#division', data, 'divisionNameBn', 'Id');
                     resetDependentDropdowns(['#district', '#thana', '#union', '#village']);
                 },
                 error: function () {
@@ -238,6 +239,7 @@
             const divisionId = $('#division').val();
             if (!divisionId) return;
             var data = { dId: divisionId };
+            console.log(data)
             $.ajax({
                 url: `/api/Home/Home/GetDistrictByDivisionId`,
                 type: 'POST',
@@ -248,7 +250,7 @@
                     'RequestVerificationToken': token
                 },
                 success: function (data) {
-                    populateDropdown('#district', data, 'districtNameBn', 'id');
+                    populateDropdown('#district', data, 'districtNameBn', 'Id');
                     resetDependentDropdowns(['#thana', '#union', '#village']);
                 },
                 error: function () {
@@ -271,7 +273,7 @@
                     'RequestVerificationToken': token
                 },
                 success: function (data) {
-                    populateDropdown('#thana', data, 'policeThanaNameBn', 'id');
+                    populateDropdown('#thana', data, 'policeThanaNameBn', 'Id');
                     resetDependentDropdowns(['#union', '#village']);
                 },
                 error: function () {
@@ -294,7 +296,7 @@
                     'RequestVerificationToken': token
                 },
                 success: function (data) {
-                    populateDropdown('#union', data, 'unionWordNameBn', 'id');
+                    populateDropdown('#union', data, 'unionWordNameBn', 'Id');
                     resetDependentDropdowns(['#village']);
                 },
                 error: function () {
@@ -318,7 +320,7 @@
                     'RequestVerificationToken': token
                 },
                 success: function (data) {
-                    populateDropdown('#village', data, 'villageNameBn', 'id');
+                    populateDropdown('#village', data, 'villageNameBn', 'Id');
                 },
                 error: function () {
                     alert('Error loading villages.');
@@ -394,7 +396,7 @@
             }
 
             $.ajax({
-                url: '/api/sendOTP',
+                url: '/api/Auth/Account/sendOTP',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ mobileNumber }),
@@ -425,7 +427,7 @@
             const mobileNumber = $('#mobileNumber').val();
 
             $.ajax({
-                url: '/api/verifyOTP',
+                url: '/api/Auth/Account/verifyOTP',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ mobileNumber, otp }),
