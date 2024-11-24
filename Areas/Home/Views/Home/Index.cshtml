@@ -1,4 +1,6 @@
-﻿@{
+﻿@using DropSpace.Helpers
+
+@{
     ViewData["Title"] = "Register";
     if (ViewBag.userName != null)
     {
@@ -105,6 +107,12 @@
                                    placeholder="আপনার মোবাইল নম্বর লিখুন"
                                    value="@ViewBag.userName"
                             @(ViewBag.userName != null && ViewBag.userName != "" ? "disabled" : "")>
+
+                            @if (ViewBag.userName != null && ViewBag.userName != "")
+                            {
+                                <input type="hidden" name="mobile" value="@(ViewBag.userName != null ? IdMasking.Decode(ViewBag.userName.ToString()) : "")">
+                            }
+
                             <button type="button"
                                     class="ml-1 text-blue-500 hover:underline w-50 @(ViewBag.userName != null && ViewBag.userName != "" ? "hidden" : "")"
                                     id="sendOTPButton">
@@ -164,7 +172,7 @@
 
                 $('#mobileSection').removeClass('hidden');
 
-                $('#mobileNumber').val('@ViewBag.userName');
+                $('#mobileNumber').val('@(ViewBag.userName != null ? IdMasking.Decode(ViewBag.userName.ToString()) : "")');
                 $('#mobileNumber').prop('disabled', true);
 
                 $('#sendOTPButton').addClass('hidden');
