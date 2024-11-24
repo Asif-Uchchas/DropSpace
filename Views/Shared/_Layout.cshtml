@@ -241,7 +241,9 @@
         border-radius: 3px;
     }
 </style>
-
+@{
+    @using DropSpace.Helpers
+}
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg custom-navbar fixed-top bg-white shadow-lg">
@@ -280,8 +282,8 @@
                 <!-- Profile -->
                 <div class="dropdown">
                     <a class="btn btn-link text-dark d-flex align-items-center" href="/Home/Home/Index">
-                        <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
-                        <span class="fw-bold">Username</span>
+                        <img src="~/Assets/user.svg" alt="Profile" class="rounded-circle me-2 mr-2" style="width: 30px; height: 30px;">
+                        <span class="fw-bold">@(ViewBag.userName != null ? IdMasking.Decode(ViewBag.userName.ToString()) : "Username")</span>
                     </a>
                     @* <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
                         <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">
