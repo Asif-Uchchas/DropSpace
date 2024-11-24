@@ -32,7 +32,7 @@
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">অপরাধের ধরণ</label>
                             <select id="type" name="typeId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" selected>বিভাগ নির্বাচন করুন</option>
+                                <option value="" selected>অপরাধের ধরণ নির্বাচন করুন</option>
                                 @foreach (var item in ViewBag.type)
                                 {
                                     <option value="@item.Id">@item.crimeTypeNameBn</option>
@@ -95,11 +95,19 @@
                         <span class="ml-2 text-gray-700">আপনার মোবাইল নম্বর ট্র্যাকিংয়ের জন্য যোগ করতে পারেন</span>
                     </label>
 
-                    <div id="mobileSection" class="mt-4 hidden">
+                    <div id="mobileSection" class="mt-4 @(ViewBag.userName != null && ViewBag.userName != "" ? "" : "hidden")">
                         <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
                         <div class="flex items-center">
-                            <input type="text" id="mobileNumber" name="mobile" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="আপনার মোবাইল নম্বর লিখুন">
-                            <button type="button" class="ml-1 text-blue-500 hover:underline w-50" id="sendOTPButton">
+                            <input type="text"
+                                   id="mobileNumber"
+                                   name="mobile"
+                                   class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                   placeholder="আপনার মোবাইল নম্বর লিখুন"
+                                   value="@ViewBag.userName"
+                            @(ViewBag.userName != null && ViewBag.userName != "" ? "disabled" : "")>
+                            <button type="button"
+                                    class="ml-1 text-blue-500 hover:underline w-50 @(ViewBag.userName != null && ViewBag.userName != "" ? "hidden" : "")"
+                                    id="sendOTPButton">
                                 ওটিপি পাঠান
                             </button>
                         </div>
@@ -149,6 +157,36 @@
                 $('.active').removeClass('active');
                 $('#upload').addClass('active');
             }
+
+            if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName' != 'null') {
+                
+                $('#showMobile').prop('checked', true);
+
+                $('#mobileSection').removeClass('hidden');
+
+                $('#mobileNumber').val('@ViewBag.userName');
+                $('#mobileNumber').prop('disabled', true);
+
+                $('#sendOTPButton').addClass('hidden');
+                $('#otpSection').addClass('hidden');
+
+                $('#submitButton').removeClass('hidden');
+
+                $('#showMobile').prop('disabled', true);
+            } else {
+
+                $('#showMobile').change(function () {
+                    if (this.checked) {
+                        $('#mobileSection').removeClass('hidden');
+                        $('#submitButton').addClass('hidden');
+                    } else {
+                        $('#mobileSection').addClass('hidden');
+                        $('#submitButton').removeClass('hidden');
+                    }
+                });
+            }
+
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     $('#latitude').val(position.coords.latitude);
@@ -193,6 +231,15 @@
                 });
             }
 
+            $('#showMobile').change(function () {
+                if (this.checked) {
+                    // Hide submit button when phone verification is required
+                    $('#submitButton').addClass('hidden');
+                } else {
+                    // Show submit button if phone verification is not required
+                    $('#submitButton').removeClass('hidden');
+                }
+            });
 
             loadDivisions();
 
@@ -377,9 +424,21 @@
         }
 
         function validateForm() {
-            const isValid = $('#name').val() && $('#division').val() && $('#district').val() && $('#thana').val() && $('#union').val() && $('#village').val() && $('#fileList .flex').length > 0;
-            
-            //$('#submitButton').prop('disabled', !isValid);
+            const basicValidation = $('#division').val() && $('#district').val() &&
+                $('#thana').val() && $('#union').val() &&
+                $('#village').val() && $('#fileList .flex').length > 0;
+
+            const phoneCheckbox = $('#showMobile').is(':checked');
+            const hasPrefilledMobile = '@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName' != 'null';
+            const otpVerified = $('#verifyOTPButtonSuccess').is(':visible');
+
+            // If user has pre-filled mobile, skip OTP verification check
+            // Otherwise, require OTP verification if checkbox is checked
+            const isValid = hasPrefilledMobile ?
+                basicValidation :
+                (phoneCheckbox ? (basicValidation && otpVerified) : basicValidation);
+
+            return isValid;
         }
 
         function sendOTP() {
@@ -434,6 +493,9 @@
                 success: function () {
                     $('#verifyOTPButton').addClass('hidden');
                     $('#verifyOTPButtonSuccess').removeClass('hidden');
+                    // Show the submit button after successful OTP verification
+                    $('#submitButton').removeClass('hidden');
+
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
@@ -442,9 +504,6 @@
                         confirmButtonColor: '#3085d6'
                     });
                     validateForm();
-
-                    // Show the submit button after successful OTP verification
-                    $('#submitButton').removeClass('hidden'); // Show the submit button
                 },
                 error: function () {
                     Swal.fire({
