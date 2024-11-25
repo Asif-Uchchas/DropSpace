@@ -19,9 +19,14 @@
     <div class="max-w-full sm:max-w-6xl mx-auto px-6 sm:px-11 py-8 sm:py-17">
         <div class="text-center">
             <h1 class="text-3xl sm:text-5xl font-bold text-gray-900 mb-6">Upload & Share Instantly</h1>
-            <p class="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                যেকোনো ধরনের ফাইল নিরাপদে শেয়ার করুন। রেজিস্ট্রেশন প্রয়োজন নেই।
+            <p class="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto text-center">
+                অডিও, ভিডিও কিংবা ইমেজ ফাইল নিরাপদে শেয়ার করুন।
             </p>
+
+            <p class="text-lg sm:text-lg text-gray-600 mb-8 max-w-2xl mx-1 text-center font-bold">
+                রেজিস্ট্রেশন বাধ্যতামূলক নয়।
+            </p>
+
         </div>
 
         <div class="mt-8 max-w-full sm:max-w-2xl mx-auto">
@@ -34,7 +39,7 @@
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700">ঘটনার ধরণ</label>
                             <select id="type" name="typeId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" selected>ঘটনার ধরণ নির্বাচন করুন</option>
+                                <option value="" selected>নির্বাচন করুন</option>
                                 @foreach (var item in ViewBag.type)
                                 {
                                     <option value="@item.Id">@item.crimeTypeNameBn</option>
@@ -95,7 +100,7 @@
                     <label for="showMobile" class="inline-flex items-center">
                         <input type="checkbox" id="showMobile" class="form-checkbox h-5 w-5 text-indigo-600">
                         <span class="ml-2 text-gray-700">
-                            আপনার আপলোডকৃত তথ্য দেখতে চাইলে মোবাইল নম্বর যোগ করতে পারেন
+                            আপনার আপলোডকৃত তথ্য দেখতে চাইলে মোবাইল নম্বর যোগ করতে পারেন।
                         </span>
                     </label>
 
