@@ -97,14 +97,11 @@
 
                 <!-- Mobile Number Section -->
                 <div class="mt-8">
-                    <label for="showMobile" class="inline-flex items-center">
-                        <input type="checkbox" id="showMobile" class="form-checkbox h-5 w-5 text-indigo-600">
-                        <span class="ml-2 text-gray-700">
-                            আপনার আপলোডকৃত তথ্য দেখতে চাইলে মোবাইল নম্বর যোগ করতে পারেন।
-                        </span>
-                    </label>
+                    <p class="text-gray-700 mb-4">
+                        আপনার আপলোডকৃত তথ্য দেখতে মোবাইল নম্বর যোগ করুন।
+                    </p>
 
-                    <div id="mobileSection" class="mt-4 @(ViewBag.userName != null && ViewBag.userName != "" ? "" : "hidden")">
+                    <div id="mobileSection" class="mt-4 @(ViewBag.userName != null && ViewBag.userName != "" ? "" : "")">
                         <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
                         <div class="flex items-center">
                             <input type="text"
@@ -113,6 +110,7 @@
                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                                    placeholder="আপনার মোবাইল নম্বর লিখুন"
                                    value="@ViewBag.userName"
+                                   required
                             @(ViewBag.userName != null && ViewBag.userName != "" ? "disabled" : "")>
 
                             @if (ViewBag.userName != null && ViewBag.userName != "")
@@ -122,7 +120,7 @@
 
                             <button type="button"
                                     class="ml-1 text-blue-500 hover:underline w-50 @(ViewBag.userName != null && ViewBag.userName != "" ? "hidden" : "")"
-                                    id="sendOTPButton" onclick="sendOTP()">
+                                    id="sendOTPButton">
                                 ওটিপি পাঠান
                             </button>
                         </div>
@@ -172,34 +170,12 @@
             if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName'!='null') {
                 $('.active').removeClass('active');
                 $('#upload').addClass('active');
-            }
-
-            if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName' != 'null') {
-                
-                $('#showMobile').prop('checked', true);
-
-                $('#mobileSection').removeClass('hidden');
 
                 $('#mobileNumber').val('@(ViewBag.userName != null ? IdMasking.Decode(ViewBag.userName.ToString()) : "")');
                 $('#mobileNumber').prop('disabled', true);
-
                 $('#sendOTPButton').addClass('hidden');
                 $('#otpSection').addClass('hidden');
-
                 $('#submitButton').removeClass('hidden');
-
-                $('#showMobile').prop('disabled', true);
-            } else {
-
-                $('#showMobile').change(function () {
-                    if (this.checked) {
-                        $('#mobileSection').removeClass('hidden');
-                        $('#submitButton').addClass('hidden');
-                    } else {
-                        $('#mobileSection').addClass('hidden');
-                        $('#submitButton').removeClass('hidden');
-                    }
-                });
             }
 
 
@@ -268,13 +244,12 @@
             $('#browseFilesButton').click(function () {
                 $('#fileInput').click();
             });
-            $('#showMobile').change(function () {
-                $('#mobileSection').toggle(this.checked);
-                validateForm();
-            });
             $('#sendOTPButton').click(sendOTP);
             $('#verifyOTPButton').click(verifyOTP);
             $('#uploadForm').submit(validateAndSubmit);
+
+            // Setup OTP input handling
+            setupOTPInputs();
         });
 
         function loadDivisions() {
@@ -460,20 +435,24 @@
         }
 
         function validateForm() {
-            const basicValidation = $('#division').val() && $('#district').val() &&
-                $('#thana').val() && $('#union').val() &&
-                $('#village').val() && $('#fileList .flex').length > 0;
+            const basicValidation = $('#division').val() &&
+                $('#district').val() &&
+                $('#thana').val() &&
+                $('#union').val() &&
+                $('#village').val() &&
+                $('#fileList .flex').length > 0;
 
-            const phoneCheckbox = $('#showMobile').is(':checked');
-            const hasPrefilledMobile = '@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName' != 'null';
+            const hasPrefilledMobile = '@ViewBag.userName' != null &&
+                '@ViewBag.userName' != '' &&
+                '@ViewBag.userName' != 'null';
             const otpVerified = $('#verifyOTPButtonSuccess').is(':visible');
 
-            // If user has pre-filled mobile, skip OTP verification check
-            // Otherwise, require OTP verification if checkbox is checked
+            // Show submit button only if all validations pass
             const isValid = hasPrefilledMobile ?
                 basicValidation :
-                (phoneCheckbox ? (basicValidation && otpVerified) : basicValidation);
+                (basicValidation && otpVerified);
 
+            $('#submitButton').toggleClass('hidden', !isValid);
             return isValid;
         }
 
@@ -557,47 +536,51 @@
             });
         }
 
-        // Handle paste and backspace functionality
-        $(document).on('input', '#otpInputs input', function (e) {
-            const $this = $(this);
-            const value = $this.val();
+        function setupOTPInputs() {
+            // Handle OTP input field behavior
+            $(document).on('input', '#otpInputs input', function (e) {
+                const $this = $(this);
+                const value = $this.val();
 
-            // Handle paste
-            if (e.originalEvent && e.originalEvent.clipboardData) {
-                const pastedData = e.originalEvent.clipboardData.getData('text');
-                if (pastedData.length > 6) {
-                    // If pasted data is longer than 6, we only take the first 6 characters
-                    const otpArray = pastedData.slice(0, 6).split('');
-                    $('#otpInputs input').each((index, input) => {
-                        $(input).val(otpArray[index] || '');
-                    });
-                    return;
+                // Handle paste
+                if (e.originalEvent && e.originalEvent.clipboardData) {
+                    const pastedData = e.originalEvent.clipboardData.getData('text');
+                    if (pastedData.length > 6) {
+                        const otpArray = pastedData.slice(0, 6).split('');
+                        $('#otpInputs input').each((index, input) => {
+                            $(input).val(otpArray[index] || '');
+                        });
+                        return;
+                    }
                 }
-            }
 
-            // Move to next input field
-            if (value.length === 1) {
-                const nextInput = $this.next('input');
-                if (nextInput.length) {
-                    nextInput.focus();
+                // Auto-focus next field
+                if (value.length === 1) {
+                    const nextInput = $this.next('input');
+                    if (nextInput.length) nextInput.focus();
                 }
-            }
+            });
 
             // Handle backspace
-            if (e.key === 'Backspace' && value.length === 0) {
-                const prevInput = $this.prev('input');
-                if (prevInput.length) {
-                    prevInput.focus();
+            $(document).on('keydown', '#otpInputs input', function (e) {
+                if (e.key === 'Backspace') {
+                    const $this = $(this);
+                    if ($this.val().length === 0) {
+                        const prevInput = $this.prev('input');
+                        if (prevInput.length) prevInput.focus();
+                    }
                 }
-            }
-        });
+            });
 
-        // Ensure only numbers can be entered in OTP fields
-        $(document).on('keydown', '#otpInputs input', function (e) {
-            if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Tab') {
-                e.preventDefault();
-            }
-        });
+            // Ensure only numbers
+            $(document).on('keydown', '#otpInputs input', function (e) {
+                if (!/[0-9]/.test(e.key) &&
+                    e.key !== 'Backspace' &&
+                    e.key !== 'Tab') {
+                    e.preventDefault();
+                }
+            });
+        }
 
         function validateAndSubmit(event) {
             event.preventDefault();
