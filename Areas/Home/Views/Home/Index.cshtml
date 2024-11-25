@@ -416,26 +416,46 @@
             validateForm();
         }
 
+        let selectedFiles = []; // Array to hold the selected files
+
         function handleFiles(event) {
             const files = event.target.files;
-            $('#fileList').empty().removeClass('hidden');
-            $.each(files, function (index, file) {
-                $('#fileList').append(`
-                            <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
-                                <div class="flex items-center space-x-4">
-                                    <p class="text-sm font-medium text-gray-900">${file.name}</p>
-                                    <p class="text-sm text-gray-500">${(file.size / 1024).toFixed(2)} KB</p>
-                                </div>
-                                <button type="button" class="text-red-600 hover:text-red-800" onclick="removeFile(this)">মুছে ফেলুন</button>
-                            </div>
-                        `);
+
+            // Convert FileList to an array
+            const newFiles = Array.from(files);
+
+            // Filter out duplicates
+            newFiles.forEach(file => {
+                if (!selectedFiles.some(selectedFile => selectedFile.name === file.name)) {
+                    selectedFiles.push(file);
+                }
             });
+
+            // Clear the file list display
+            $('#fileList').empty().removeClass('hidden');
+
+            // Populate the file list display with the selected files
+            $.each(selectedFiles, function (index, file) {
+                $('#fileList').append(`
+                    <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+                        <div class="flex items-center space-x-4">
+                            <p class="text-sm font-medium text-gray-900">${file.name}</p>
+                            <p class="text-sm text-gray-500">${(file.size / 1024).toFixed(2)} KB</p>
+                        </div>
+                        <button type="button" class="text-red-600 hover:text-red-800" onclick="removeFile(${index})">মুছে ফেলুন</button>
+                    </div>
+                `);
+            });
+
             validateForm();
         }
 
-        function removeFile(button) {
-            $(button).closest('.flex').remove();
-            validateForm();
+        function removeFile(index) {
+            // Remove the file at the specified index from the selectedFiles array
+            selectedFiles.splice(index, 1);
+
+            // Update the file list display
+            handleFiles({ target: { files: selectedFiles } });
         }
 
         function validateForm() {
