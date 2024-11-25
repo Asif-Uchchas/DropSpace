@@ -17,6 +17,8 @@ using DropSpace.Repository.Contracts;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using DropSpace.Helpers.LinkEncrypt;
+using DropSpace.ERPServices.MobilePhoneValidation.Interfaces;
+using DropSpace.ERPServices.MobilePhoneValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 #region Configure Services
@@ -93,6 +95,7 @@ builder.Services.AddScoped<IDapper, DropSpace.Services.Dapper.Dapper>();
 builder.Services.AddScoped<IUserInfoes, UserInfoes>();
 builder.Services.AddScoped<IPersonData, PersonData>();
 builder.Services.AddScoped<IMasterData, MasterDataService>();
+builder.Services.AddScoped<IMobilePhoneValidation, MobilePhoneValidationService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 #endregion
 // Add HttpClient and WebHostEnvironment

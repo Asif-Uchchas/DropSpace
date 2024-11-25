@@ -1,7 +1,10 @@
 ﻿using DropSpace.Areas.Auth.Models;
 using DropSpace.Data.Entity;
+using DropSpace.Data.Entity.LogInfo;
 using DropSpace.Data.Entity.MasterData;
 using DropSpace.ERPService.AuthService.Interfaces;
+using DropSpace.ERPServices.MobilePhoneValidation;
+using DropSpace.ERPServices.MobilePhoneValidation.Interfaces;
 using DropSpace.Repository.Contracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -23,17 +26,19 @@ namespace DropSpace.Areas.Auth.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IMobilePhoneValidation _mobilePhoneValidation;
         private readonly IUserInfoes userInfoes;
 
         private const string FIXED_OTP = "123456";
         private static readonly Dictionary<string, string> _otpStorage = new Dictionary<string, string>();
         private static readonly Regex _mobileRegex = new Regex(@"^01[3-9]\d{8}$");
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager, IUserInfoes userInfoes
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager, IUserInfoes userInfoes, IMobilePhoneValidation mobilePhoneValidation
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _mobilePhoneValidation = mobilePhoneValidation;
             this.userInfoes = userInfoes;
         }
 
@@ -78,10 +83,10 @@ namespace DropSpace.Areas.Auth.Controllers
             {
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 {
-                    return Redirect(returnUrl); 
+                    return Redirect(returnUrl);
                 }
 
-                
+
                 return RedirectToAction("Dashboard", "DashBoard", new { area = "Dboard" });
             }
 
@@ -94,11 +99,11 @@ namespace DropSpace.Areas.Auth.Controllers
                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             }
 
-            return View(model); 
+            return View(model);
         }
 
 
-        
+
         [AllowAnonymous]
         public async Task<IActionResult> MobileLogin(string returnUrl = null)
         {
@@ -276,7 +281,7 @@ namespace DropSpace.Areas.Auth.Controllers
             //var oldRoleName = _roleManager.Roles.SingleOrDefault(r => r.Id == oldRoleId).Name;
             var roles = await _userManager.GetRolesAsync(user);
             await _userManager.RemoveFromRolesAsync(user, roles.ToArray());
-            
+
             if (model.PreRoleId != null)
             {
                 for (int i = 0; i < model.roleIdList.Length; i++)
@@ -369,7 +374,7 @@ namespace DropSpace.Areas.Auth.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            
+
             return RedirectToAction("Login");
         }
 
@@ -381,7 +386,7 @@ namespace DropSpace.Areas.Auth.Controllers
         //}
 
 
-        
+
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
@@ -403,7 +408,7 @@ namespace DropSpace.Areas.Auth.Controllers
 
                 throw ex;
             }
-            
+
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -417,24 +422,31 @@ namespace DropSpace.Areas.Auth.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
+
+
         [HttpPost]
-        [Route("/api/[area]/[controller]/[action]")]
-        public IActionResult SendOTP([FromBody] JsonElement request)
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> SendOTP([FromBody] JsonElement request)
         {
             try
             {
                 string mobileNumber = request.GetProperty("mobileNumber").GetString();
 
-                if (string.IsNullOrEmpty(mobileNumber) || !_mobileRegex.IsMatch(mobileNumber))
+                if (string.IsNullOrEmpty(mobileNumber))
                 {
                     return BadRequest(new { success = false, message = "Invalid mobile number format" });
                 }
 
-                // Store the fixed OTP for this mobile number
-                _otpStorage[mobileNumber] = FIXED_OTP;
+                // Generate OTP (you can generate a real OTP here)
+                string otp = FIXED_OTP; // For example purposes, a fixed OTP
 
-                // Log for debugging (remove in production)
-                Console.WriteLine($"OTP sent to {mobileNumber}: {FIXED_OTP}");
+                // Call the service method to log OTP
+                bool otpSent = await _mobilePhoneValidation.SendOTP(mobileNumber, otp);
+
+                if (!otpSent)
+                {
+                    return StatusCode(500, new { success = false, message = "An error occurred while sending OTP" });
+                }
 
                 return Ok(new { success = true, message = "OTP sent successfully" });
             }
@@ -447,14 +459,14 @@ namespace DropSpace.Areas.Auth.Controllers
 
         [HttpPost]
         [Route("/api/[area]/[controller]/[action]")]
-        public IActionResult VerifyOTP([FromBody] JsonElement request)
+        public async Task<IActionResult> VerifyOTP([FromBody] JsonElement request)
         {
             try
             {
                 string mobileNumber = request.GetProperty("mobileNumber").GetString();
                 string otp = request.GetProperty("otp").GetString();
 
-                if (string.IsNullOrEmpty(mobileNumber) || !_mobileRegex.IsMatch(mobileNumber))
+                if (string.IsNullOrEmpty(mobileNumber))
                 {
                     return BadRequest(new { success = false, message = "Invalid mobile number format" });
                 }
@@ -464,13 +476,16 @@ namespace DropSpace.Areas.Auth.Controllers
                     return BadRequest(new { success = false, message = "OTP is required" });
                 }
 
-                // For the dummy implementation, just check if the OTP matches our fixed value
-                if (otp == FIXED_OTP)
+                // Call the service method to verify OTP
+                bool otpVerified = await _mobilePhoneValidation.VerifyOTP(mobileNumber, otp);
+
+                if (!otpVerified)
                 {
-                    return Ok(new { success = true, message = "OTP verified successfully" });
+                    return BadRequest(new { success = false, message = "Invalid OTP or OTP has expired" });
                 }
 
-                return BadRequest(new { success = false, message = "Invalid OTP" });
+                //return Ok(new { success = true, message = "OTP verified successfully" });
+                return Json(new { success = true, message = "OTP verified successfully" });
             }
             catch (Exception ex)
             {
@@ -479,4 +494,5 @@ namespace DropSpace.Areas.Auth.Controllers
             }
         }
     }
+    
 }
