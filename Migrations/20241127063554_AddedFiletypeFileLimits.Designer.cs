@@ -4,16 +4,19 @@ using DropSpace.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DropSpace.Migrations
+namespace DropZone_BackPanel.Migrations
 {
     [DbContext(typeof(DropSpaceDbContext))]
-    partial class DropSpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241127063554_AddedFiletypeFileLimits")]
+    partial class AddedFiletypeFileLimits
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace DropSpace.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DropSpace.Data.Entity.ApplicationRole", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.ApplicationRole", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -49,7 +52,7 @@ namespace DropSpace.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.ApplicationUser", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -137,7 +140,7 @@ namespace DropSpace.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.Droper.FileLimits", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.Droper.FileLimits", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -202,7 +205,7 @@ namespace DropSpace.Migrations
                     b.ToTable("fileLimits");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.Droper.PersonsData", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.Droper.PersonsData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -254,7 +257,7 @@ namespace DropSpace.Migrations
                     b.ToTable("personalDatas");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.Droper.UploadedFiles", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.Droper.UploadedFiles", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -297,7 +300,7 @@ namespace DropSpace.Migrations
                     b.ToTable("uploadedFiles");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.LogInfo.OTPLogs", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.LogInfo.OTPLogs", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -339,7 +342,7 @@ namespace DropSpace.Migrations
                     b.ToTable("oTPLogs");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.LogInfo.UserLogHistory", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.LogInfo.UserLogHistory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -424,7 +427,7 @@ namespace DropSpace.Migrations
                     b.ToTable("UserLogHistories");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.CrimeInfo", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.CrimeInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -460,7 +463,7 @@ namespace DropSpace.Migrations
                     b.ToTable("crimeInfos");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.FileType", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.FileType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -497,7 +500,7 @@ namespace DropSpace.Migrations
                     b.ToTable("fileTypes");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -547,7 +550,7 @@ namespace DropSpace.Migrations
                     b.ToTable("divisionDistricts");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.PoliceThana", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.PoliceThana", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -629,7 +632,7 @@ namespace DropSpace.Migrations
                     b.ToTable("policeThanas");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.RangeMetro", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.RangeMetro", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -674,7 +677,7 @@ namespace DropSpace.Migrations
                     b.ToTable("rangeMetros");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.ZoneCircle", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.ZoneCircle", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -724,7 +727,7 @@ namespace DropSpace.Migrations
                     b.ToTable("zoneCircles");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Country", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Country", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -775,7 +778,7 @@ namespace DropSpace.Migrations
                     b.ToTable("countries");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.District", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.District", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -831,7 +834,7 @@ namespace DropSpace.Migrations
                     b.ToTable("districts");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Division", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Division", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -887,7 +890,7 @@ namespace DropSpace.Migrations
                     b.ToTable("divisions");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Thana", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -943,7 +946,7 @@ namespace DropSpace.Migrations
                     b.ToTable("thanas");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.UnionWard", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -999,7 +1002,7 @@ namespace DropSpace.Migrations
                     b.ToTable("unionWards");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Village", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Village", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1055,7 +1058,7 @@ namespace DropSpace.Migrations
                     b.ToTable("villages");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.UserType", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.UserType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1198,9 +1201,9 @@ namespace DropSpace.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.Droper.FileLimits", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.Droper.FileLimits", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.FileType", "fileType")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.FileType", "fileType")
                         .WithMany()
                         .HasForeignKey("fileTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1209,13 +1212,13 @@ namespace DropSpace.Migrations
                     b.Navigation("fileType");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.Droper.PersonsData", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.Droper.PersonsData", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", "union")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.UnionWard", "union")
                         .WithMany()
                         .HasForeignKey("unionId");
 
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Village", "village")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Village", "village")
                         .WithMany()
                         .HasForeignKey("villageId");
 
@@ -1224,13 +1227,13 @@ namespace DropSpace.Migrations
                     b.Navigation("village");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.Droper.UploadedFiles", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.Droper.UploadedFiles", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.CrimeInfo", "crimeType")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.CrimeInfo", "crimeType")
                         .WithMany()
                         .HasForeignKey("crimeTypeId");
 
-                    b.HasOne("DropSpace.Data.Entity.Droper.PersonsData", "personsData")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.Droper.PersonsData", "personsData")
                         .WithMany()
                         .HasForeignKey("personsDataId");
 
@@ -1239,34 +1242,34 @@ namespace DropSpace.Migrations
                     b.Navigation("personsData");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.RangeMetro", "rangeMetro")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.RangeMetro", "rangeMetro")
                         .WithMany()
                         .HasForeignKey("rangeMetroId");
 
                     b.Navigation("rangeMetro");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.PoliceThana", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.PoliceThana", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", "divisionDistrict")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", "divisionDistrict")
                         .WithMany()
                         .HasForeignKey("divisionDistrictId");
 
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.PoliceThana", "policeThana")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.PoliceThana", "policeThana")
                         .WithMany()
                         .HasForeignKey("policeThanaId");
 
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.RangeMetro", "rangeMetro")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.RangeMetro", "rangeMetro")
                         .WithMany()
                         .HasForeignKey("rangeMetroId");
 
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", "upazilla")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Thana", "upazilla")
                         .WithMany()
                         .HasForeignKey("upazillaId");
 
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.ZoneCircle", "zoneCircle")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.ZoneCircle", "zoneCircle")
                         .WithMany()
                         .HasForeignKey("zoneCircleId");
 
@@ -1281,18 +1284,18 @@ namespace DropSpace.Migrations
                     b.Navigation("zoneCircle");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PoliceMapping.ZoneCircle", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.ZoneCircle", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", "divisionDistrict")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PoliceMapping.DivisionDistrict", "divisionDistrict")
                         .WithMany()
                         .HasForeignKey("divisionDistrictId");
 
                     b.Navigation("divisionDistrict");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.District", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.District", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Division", "division")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Division", "division")
                         .WithMany()
                         .HasForeignKey("divisionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1301,9 +1304,9 @@ namespace DropSpace.Migrations
                     b.Navigation("division");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Division", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Division", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Country", "country")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Country", "country")
                         .WithMany()
                         .HasForeignKey("countryId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1312,9 +1315,9 @@ namespace DropSpace.Migrations
                     b.Navigation("country");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Thana", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.District", "district")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.District", "district")
                         .WithMany()
                         .HasForeignKey("districtId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1323,9 +1326,9 @@ namespace DropSpace.Migrations
                     b.Navigation("district");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.UnionWard", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.Thana", "thana")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Thana", "thana")
                         .WithMany()
                         .HasForeignKey("thanaId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1334,9 +1337,9 @@ namespace DropSpace.Migrations
                     b.Navigation("thana");
                 });
 
-            modelBuilder.Entity("DropSpace.Data.Entity.MasterData.PublicMapping.Village", b =>
+            modelBuilder.Entity("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.Village", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.MasterData.PublicMapping.UnionWard", "unionWard")
+                    b.HasOne("DropZone_BackPanel.Data.Entity.MasterData.PublicMapping.UnionWard", "unionWard")
                         .WithMany()
                         .HasForeignKey("unionWardId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1347,7 +1350,7 @@ namespace DropSpace.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.ApplicationRole", null)
+                    b.HasOne("DropZone_BackPanel.Data.Entity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1356,7 +1359,7 @@ namespace DropSpace.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.ApplicationUser", null)
+                    b.HasOne("DropZone_BackPanel.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1365,7 +1368,7 @@ namespace DropSpace.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.ApplicationUser", null)
+                    b.HasOne("DropZone_BackPanel.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1374,13 +1377,13 @@ namespace DropSpace.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.ApplicationRole", null)
+                    b.HasOne("DropZone_BackPanel.Data.Entity.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DropSpace.Data.Entity.ApplicationUser", null)
+                    b.HasOne("DropZone_BackPanel.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1389,7 +1392,7 @@ namespace DropSpace.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("DropSpace.Data.Entity.ApplicationUser", null)
+                    b.HasOne("DropZone_BackPanel.Data.Entity.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -7,6 +7,7 @@ using DropSpace.Data.Entity.Droper;
 using DropSpace.Data.Entity.LogInfo;
 using DropSpace.Data.Entity.MasterData.PublicMapping;
 using DropSpace.Data.Entity.MasterData.PoliceMapping;
+using Microsoft.VisualBasic.FileIO;
 
 namespace DropSpace.Context
 {
@@ -35,10 +36,12 @@ namespace DropSpace.Context
         #endregion
         public DbSet<CrimeInfo> crimeInfos { get; set; }
         public DbSet<UserType> userTypes { get; set; }
+        public DbSet<FileType> fileTypes { get; set; }
         #endregion
         #region Dropers
         public DbSet<PersonsData> personalDatas { get; set; }
         public DbSet<UploadedFiles> uploadedFiles { get; set; }
+        public DbSet<FileLimits> fileLimits { get; set; }
         #endregion
         #region Log
         public DbSet<UserLogHistory> UserLogHistories { get; set; }
