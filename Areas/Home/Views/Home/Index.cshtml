@@ -240,13 +240,13 @@
             $('#district').change(loadThanas);
             $('#thana').change(loadUnions);
             $('#union').change(loadVillages);
-            $('#fileInput').change(handleFiles);
+            $('#fileInput').on('change', handleFiles);
             $('#browseFilesButton').click(function () {
                 $('#fileInput').click();
             });
             $('#sendOTPButton').click(sendOTP);
             $('#verifyOTPButton').click(verifyOTP);
-            $('#uploadForm').submit(validateAndSubmit);
+            $('#uploadForm').on('submit', validateAndSubmit);
 
             // Setup OTP input handling
             setupOTPInputs();
@@ -392,27 +392,85 @@
             validateForm();
         }
 
-        let selectedFiles = []; // Array to hold the selected files
+        let selectedFiles = []; 
+        const MAX_FILE_SIZE = 100 * 1024 * 1024; 
+        const MAX_TOTAL_FILES = 1; 
+
+        
+        function convertToBanglaNumber(number) {
+            const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            return number.toString().split('').map(digit => banglaDigits[digit] || digit).join('');
+        }
+
+        
+        const MAX_FILE_SIZE_MB_BANGLA = convertToBanglaNumber(MAX_FILE_SIZE / (1024 * 1024)); // Convert to MB
+        const MAX_TOTAL_FILES_BANGLA = convertToBanglaNumber(MAX_TOTAL_FILES);
+
 
         function handleFiles(event) {
             const files = event.target.files;
 
-            // Convert FileList to an array
+            
             const newFiles = Array.from(files);
 
-            // Filter out duplicates
+            
+            if (selectedFiles.length + newFiles.length > MAX_TOTAL_FILES) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ফাইল সীমা অতিক্রম হয়েছে',
+                    text: `সর্বাধিক ${MAX_TOTAL_FILES_BANGLA} টি ফাইল আপলোড করা যাবে।`,
+                    confirmButtonText: 'ঠিক আছে',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            
             newFiles.forEach(file => {
-                if (!selectedFiles.some(selectedFile => selectedFile.name === file.name)) {
+               
+                if (file.size > MAX_FILE_SIZE) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ফাইল সাইজ সীমা',
+                        text: `ফাইল ${file.name} এর আকার ${MAX_FILE_SIZE_MB_BANGLA} এমবি অতিক্রম করেছে এবং এটি বাদ দেওয়া হবে।`,
+                        confirmButtonText: 'ঠিক আছে',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    return;
+                }
+
+                // Check for duplicate files
+                if (!selectedFiles.some(selectedFile =>
+                    selectedFile.name === file.name && selectedFile.size === file.size)) {
                     selectedFiles.push(file);
                 }
             });
 
-            // Clear the file list display
-            $('#fileList').empty().removeClass('hidden');
+            
+            updateFileListDisplay();
 
-            // Populate the file list display with the selected files
-            $.each(selectedFiles, function (index, file) {
-                $('#fileList').append(`
+            
+            validateForm();
+        }
+
+
+
+        function updateFileListDisplay() {
+            const $fileList = $('#fileList');
+
+           
+            $fileList.empty();
+
+            
+            if (selectedFiles.length > 0) {
+                $fileList.removeClass('hidden');
+            } else {
+                $fileList.addClass('hidden');
+            }
+
+            
+            selectedFiles.forEach((file, index) => {
+                $fileList.append(`
                     <div class="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
                         <div class="flex items-center space-x-4">
                             <p class="text-sm font-medium text-gray-900">${file.name}</p>
@@ -422,17 +480,23 @@
                     </div>
                 `);
             });
-
-            validateForm();
         }
 
         function removeFile(index) {
-            // Remove the file at the specified index from the selectedFiles array
+            
             selectedFiles.splice(index, 1);
 
-            // Update the file list display
-            handleFiles({ target: { files: selectedFiles } });
+            
+            updateFileListDisplay();
+
+            
+            $('#fileInput').val('');
+
+            
+            validateForm();
         }
+
+
 
         function validateForm() {
             const basicValidation = $('#division').val() &&
@@ -584,16 +648,58 @@
 
         function validateAndSubmit(event) {
             event.preventDefault();
-            if (!$('#submitButton').is(':disabled')) {
-                // Create a form element
-                const form = $('#uploadForm')[0];
 
-                // Check form validity using HTML5 form validation
+            if (!$('#submitButton').is(':disabled')) {
+                // Create FormData object
+                const formData = new FormData($('#uploadForm')[0]);
+
+                // Clear existing file inputs
+                formData.delete('files');
+
+                // Add selected files to FormData
+                selectedFiles.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                // Check form validity
+                const form = $('#uploadForm')[0];
                 if (form.checkValidity()) {
-                    // If form is valid, submit the form
-                    form.submit();
+                    // Submit form via AJAX
+                    $.ajax({
+                        url: form.action,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            // Handle success (similar to existing success handling)
+                            // You might want to reset the form or show a success message
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'সাফল্য',
+                                text: 'ডেটা সফলভাবে আপলোড করা হয়েছে।',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+
+                            // Reset form and selected files
+                            selectedFiles = [];
+                            updateFileListDisplay();
+                            form.reset();
+                        },
+                        error: function (xhr, status, error) {
+                            // Handle error
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'ত্রুটি',
+                                text: 'ফাইল আপলোড করা যায়নি। দয়া করে আবার চেষ্টা করুন।',
+                                confirmButtonText: 'OK',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+                    });
                 } else {
-                    // If form is invalid, trigger HTML5 form validation
+                    // Trigger HTML5 form validation
                     form.reportValidity();
                 }
             } else {

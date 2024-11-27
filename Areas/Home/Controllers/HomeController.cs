@@ -21,6 +21,8 @@ namespace DropSpace.Areas.Home.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMasterData _masterdata;
         private readonly IGenericRepository<CrimeInfo> _repoCrimeInfo;
+        private const long MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
+        private const int MAX_TOTAL_FILES = 1; 
 
         public HomeController(IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment)
         {
@@ -51,10 +53,31 @@ namespace DropSpace.Areas.Home.Controllers
                 ViewBag.Message = "invalid_input";
                 return View();
             }
+
+            // Validate file count
+            if (files.Count > MAX_TOTAL_FILES)
+            {
+                ViewBag.MessageType = "error";
+                ViewBag.Message = "Too many files uploaded. Maximum allowed is " + MAX_TOTAL_FILES + ".";
+                return View();
+            }
+
+            // Validate file sizes
+            foreach (var file in files)
+            {
+                if (file.Length > MAX_FILE_SIZE)
+                {
+                    ViewBag.MessageType = "error";
+                    ViewBag.Message = "File " + file.FileName + " exceeds the maximum size of " + (MAX_FILE_SIZE / (1024 * 1024)) + " MB.";
+                    return View();
+                }
+            }
+
+            // Existing code for processing the request...
             int crimeType = Convert.ToInt32(IdMasking.Decode(personsData?.typeId));
-            int? unionId=null;
+            int? unionId = null;
             int? villageId = null;
-            if (personsData?.unionId!=null && personsData?.unionId != "")
+            if (personsData?.unionId != null && personsData?.unionId != "")
             {
                 unionId = Convert.ToInt32(IdMasking.Decode(personsData?.unionId));
             }
@@ -67,9 +90,8 @@ namespace DropSpace.Areas.Home.Controllers
                 latitude = personsData.latitude,
                 longitude = personsData.longitude,
                 mobile = personsData.mobile,
-                unionId= unionId,
+                unionId = unionId,
                 villageId = villageId,
-                
             };
             int personsDataId = await _persondata.AddPersonsDataAsync(personalData);
 
@@ -97,7 +119,7 @@ namespace DropSpace.Areas.Home.Controllers
                         uploadedFilesList.Add(new UploadedFiles
                         {
                             personsDataId = personsDataId,
-                            crimeTypeId=crimeType,
+                            crimeTypeId = crimeType,
                             attachmentUrl = Path.Combine("ufile", file.FileName)
                         });
                     }
@@ -124,6 +146,7 @@ namespace DropSpace.Areas.Home.Controllers
                 ViewBag.MessageType = "success";
                 ViewBag.Message = "persons_data_saved_no_files";
             }
+
             if (personsData.mobile != null && personsData.mobile != "")
             {
                 ViewBag.userName = IdMasking.Encode(personsData.mobile);
