@@ -48,6 +48,7 @@ namespace DropSpace.Areas.Home.Controllers
             if (userName != null && userName != "")
             {
                 ViewBag.otp = await _mobilePhoneValidation.GetUserOtp(IdMasking.Decode(userName));
+                ViewBag.userName = userName;
             }
             var model = new IndexViewModel
             {

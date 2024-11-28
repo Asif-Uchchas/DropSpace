@@ -495,7 +495,12 @@
 
 
         function validateForm() {
-            const basicValidation = $('#division').val() &&
+            const basicValidation =
+                $('#type').val() &&  
+                $('#dateOf').val() && 
+                $('#timeOf').val() && 
+                $('#crimeName').val() && 
+                $('#locationText').val() &&
                 $('#district').val() &&
                 $('#thana').val() &&
                 $('#union').val() &&
@@ -560,7 +565,7 @@
         }
 
         function verifyOTP() {
-            
+            debugger
             const otp = $('#otpInputs input').map(function () { return $(this).val(); }).get().join('');
             const mobileNumber = $('#mobileNumber').val();
 
@@ -572,7 +577,6 @@
                 success: function () {
                     $('#verifyOTPButton').addClass('hidden');
                     $('#verifyOTPButtonSuccess').removeClass('hidden');
-                    // Show the submit button after successful OTP verification
                     $('#submitButton').removeClass('hidden');
 
                     Swal.fire({
