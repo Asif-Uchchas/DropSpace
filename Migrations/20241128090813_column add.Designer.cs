@@ -4,16 +4,19 @@ using DropSpace.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DropSpace.Migrations
+namespace DropZone_BackPanel.Migrations
 {
     [DbContext(typeof(DropSpaceDbContext))]
-    partial class DropSpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241128090813_column add")]
+    partial class columnadd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
