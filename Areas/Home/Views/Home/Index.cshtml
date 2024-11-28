@@ -30,6 +30,8 @@
         </div>
 
         <div class="mt-8 max-w-full sm:max-w-2xl mx-auto">
+            <input type="hidden" id="fileSizeLimit" value="@ViewBag.fileSizeLimit" />
+            <input type="hidden" id="fileLimit" value="@ViewBag.fileLimit" />
             <form asp-action="Index" asp-controller="Home" asp-area="Home" method="POST" enctype="multipart/form-data" class="relative">
                 <input type="hidden" id="cId" value="@DropSpace.Helpers.IdMasking.Encode("1")"/>
                 <!-- Personal Information Section -->
@@ -167,6 +169,8 @@
         var token = $('input[name="__RequestVerificationToken"]').val();
         let MAX_FILE_SIZE;
         let MAX_TOTAL_FILES;
+        let MAX_FILE_SIZE_MB_BANGLA
+        let MAX_TOTAL_FILES_BANGLA
         $(document).ready(function () {
             ;
             if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName'!='null') {
@@ -255,10 +259,12 @@
             // Setup OTP input handling
             setupOTPInputs();
 
-            const MAX_FILE_SIZE = parseInt('@ViewBag.fileSizeLimit') * 1024 * 1024;
-            const MAX_TOTAL_FILES = parseInt('@ViewBag.fileLimit');
-            console.log(MAX_FILE_SIZE)
-            console.log(MAX_TOTAL_FILES)
+            MAX_FILE_SIZE = parseInt($('#fileSizeLimit').val()) * 1024 * 1024;
+            MAX_TOTAL_FILES = parseInt($('#fileLimit').val());
+            MAX_FILE_SIZE_MB_BANGLA = convertToBanglaNumber(MAX_FILE_SIZE / (1024 * 1024));
+            MAX_TOTAL_FILES_BANGLA = convertToBanglaNumber(MAX_TOTAL_FILES);
+            console.log('Max file size ' + MAX_FILE_SIZE)
+            console.log('total file ' + MAX_TOTAL_FILES)
         });
 
         function loadDivisions() {
@@ -412,9 +418,6 @@
         }
 
         
-        const MAX_FILE_SIZE_MB_BANGLA = convertToBanglaNumber(MAX_FILE_SIZE / (1024 * 1024)); // Convert to MB
-        const MAX_TOTAL_FILES_BANGLA = convertToBanglaNumber(MAX_TOTAL_FILES);
-
 
         function handleFiles(event) {
             debugger
