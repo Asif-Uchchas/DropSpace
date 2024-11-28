@@ -58,12 +58,15 @@ namespace DropSpace.Areas.Home.Controllers
         public async Task<IActionResult> Index([FromForm] PersonsDataViewModel personsData, [FromForm] IFormFileCollection files)
         {
             var uploadSettings = await _fileHandlingService.GetFileUploadSettingsAsync();
+            var fileLimits = uploadSettings.fileLimits.FirstOrDefault();
             var crimeTypes = await _repoCrimeInfo.FindAll();
             ViewBag.type = crimeTypes.Select(x => new CrimeTypeViewModel
             {
                 Id = IdMasking.Encode(x.Id.ToString()),
                 crimeTypeNameBn = x.crimeType
             });
+            ViewBag.fileLimit = fileLimits?.dayFileNo;
+            ViewBag.fileSizeLimit = fileLimits?.dayFileSize;
             if (string.IsNullOrWhiteSpace(personsData?.typeId) && (files == null || files.Count == 0))
             {
                 ViewBag.MessageType = "error";
