@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using DropSpace.Helpers.LinkEncrypt;
 using DropSpace.ERPServices.MobilePhoneValidation.Interfaces;
 using DropSpace.ERPServices.MobilePhoneValidation;
+using DropSpace.Services.Filehandling.Interfaces;
+using DropSpace.Services.Filehandling;
 
 var builder = WebApplication.CreateBuilder(args);
 #region Configure Services
@@ -96,6 +98,7 @@ builder.Services.AddScoped<IUserInfoes, UserInfoes>();
 builder.Services.AddScoped<IPersonData, PersonData>();
 builder.Services.AddScoped<IMasterData, MasterDataService>();
 builder.Services.AddScoped<IMobilePhoneValidation, MobilePhoneValidationService>();
+builder.Services.AddScoped<IFileHandlingService, FileHandlingService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 #endregion
 // Add HttpClient and WebHostEnvironment

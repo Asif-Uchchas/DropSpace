@@ -30,7 +30,9 @@
         </div>
 
         <div class="mt-8 max-w-full sm:max-w-2xl mx-auto">
-            <form id="uploadForm" asp-action="Index" asp-controller="Home" asp-area="Home" method="POST" enctype="multipart/form-data" class="relative">
+            <input type="hidden" id="fileSizeLimit" value="@ViewBag.fileSizeLimit" />
+            <input type="hidden" id="fileLimit" value="@ViewBag.fileLimit" />
+            <form asp-action="Index" asp-controller="Home" asp-area="Home" method="POST" enctype="multipart/form-data" class="relative">
                 <input type="hidden" id="cId" value="@DropSpace.Helpers.IdMasking.Encode("1")"/>
                 <!-- Personal Information Section -->
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
@@ -165,8 +167,12 @@
 @section Scripts {
     <script>
         var token = $('input[name="__RequestVerificationToken"]').val();
+        let MAX_FILE_SIZE;
+        let MAX_TOTAL_FILES;
+        let MAX_FILE_SIZE_MB_BANGLA
+        let MAX_TOTAL_FILES_BANGLA
         $(document).ready(function () {
-            debugger;
+            ;
             if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName'!='null') {
                 $('.active').removeClass('active');
                 $('#upload').addClass('active');
@@ -193,7 +199,9 @@
                 "persons_data_saved_no_files": "পিপলস ডেটা সফলভাবে সংরক্ষিত হয়েছে, কিন্তু কোনো ফাইল আপলোড হয়নি।",
                 "warning_files": "ফাইলগুলি সংরক্ষণ করা হয়নি: "
             };
-
+            console.log('Ok')
+            console.log('@ViewBag.MessageType')
+            console.log('@ViewBag.Message')
             // Check for success, error or warning messages
             if ("@ViewBag.MessageType" === "success" && "@ViewBag.Message" !== "") {
                 Swal.fire({
@@ -250,9 +258,17 @@
 
             // Setup OTP input handling
             setupOTPInputs();
+
+            MAX_FILE_SIZE = parseInt($('#fileSizeLimit').val()) * 1024 * 1024;
+            MAX_TOTAL_FILES = parseInt($('#fileLimit').val());
+            MAX_FILE_SIZE_MB_BANGLA = convertToBanglaNumber(MAX_FILE_SIZE / (1024 * 1024));
+            MAX_TOTAL_FILES_BANGLA = convertToBanglaNumber(MAX_TOTAL_FILES);
+            console.log('Max file size ' + MAX_FILE_SIZE)
+            console.log('total file ' + MAX_TOTAL_FILES)
         });
 
         function loadDivisions() {
+            
             var data = { cId: $('#cId').val() };
             $.ajax({
                 url: `/api/Home/Home/GetDivisionByCountryId`,
@@ -393,8 +409,7 @@
         }
 
         let selectedFiles = []; 
-        const MAX_FILE_SIZE = 100 * 1024 * 1024; 
-        const MAX_TOTAL_FILES = 1; 
+        
 
         
         function convertToBanglaNumber(number) {
@@ -403,11 +418,9 @@
         }
 
         
-        const MAX_FILE_SIZE_MB_BANGLA = convertToBanglaNumber(MAX_FILE_SIZE / (1024 * 1024)); // Convert to MB
-        const MAX_TOTAL_FILES_BANGLA = convertToBanglaNumber(MAX_TOTAL_FILES);
-
 
         function handleFiles(event) {
+            debugger
             const files = event.target.files;
 
             
@@ -521,7 +534,7 @@
         }
 
         function sendOTP() {
-            debugger
+            
             const mobileNumber = $('#mobileNumber').val();
             if (!/^01[3-9]\d{8}$/.test(mobileNumber)) {
                 Swal.fire({
@@ -564,7 +577,7 @@
         }
 
         function verifyOTP() {
-            debugger
+            
             const otp = $('#otpInputs input').map(function () { return $(this).val(); }).get().join('');
             const mobileNumber = $('#mobileNumber').val();
 
@@ -665,39 +678,7 @@
                 const form = $('#uploadForm')[0];
                 if (form.checkValidity()) {
                     // Submit form via AJAX
-                    $.ajax({
-                        url: form.action,
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function (response) {
-                            // Handle success (similar to existing success handling)
-                            // You might want to reset the form or show a success message
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'সাফল্য',
-                                text: 'ডেটা সফলভাবে আপলোড করা হয়েছে।',
-                                confirmButtonText: 'OK',
-                                confirmButtonColor: '#3085d6'
-                            });
-
-                            // Reset form and selected files
-                            selectedFiles = [];
-                            updateFileListDisplay();
-                            form.reset();
-                        },
-                        error: function (xhr, status, error) {
-                            // Handle error
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'ত্রুটি',
-                                text: 'ফাইল আপলোড করা যায়নি। দয়া করে আবার চেষ্টা করুন।',
-                                confirmButtonText: 'OK',
-                                confirmButtonColor: '#3085d6'
-                            });
-                        }
-                    });
+                    
                 } else {
                     // Trigger HTML5 form validation
                     form.reportValidity();
