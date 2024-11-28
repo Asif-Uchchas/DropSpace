@@ -9,5 +9,6 @@ namespace DropSpace.Data.Entity.Droper
         public int? crimeTypeId { get; set; }
         public CrimeInfo? crimeType { get; set; }
         public string? attachmentUrl { get; set; }
+        public string? shortUrl { get; set; }
     }
 }

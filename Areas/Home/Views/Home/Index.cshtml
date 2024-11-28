@@ -1,8 +1,8 @@
-﻿@using DropSpace.Helpers
+﻿@model DropSpace.Areas.Home.Models.IndexViewModel;
 
 @{
     ViewData["Title"] = "Register";
-    if (ViewBag.userName != null)
+    if (Model.userName != null)
     {
         Layout = "~/Views/Shared/_layout.cshtml";
     }
@@ -15,23 +15,23 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-6 sm:px-11 py-8 sm:py-16">
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center px-6 m:px-1 py-8 md:py-0">
     <div class="max-w-full sm:max-w-6xl mx-auto px-6 sm:px-11 py-8 sm:py-17">
         <div class="text-center">
             <h1 class="text-3xl sm:text-5xl font-bold text-gray-900 mb-6">Upload & Share Instantly</h1>
-            <p class="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto text-center">
+            <p class="text-lg sm:text-xl text-gray-600 mb-3 max-w-2xl mx-auto text-center">
                 অডিও, ভিডিও কিংবা ইমেজ ফাইল নিরাপদে শেয়ার করুন।
             </p>
 
-            <p class="text-lg sm:text-lg text-gray-600 mb-8 max-w-2xl mx-1 text-center font-bold">
+            <p class="text-lg sm:text-lg text-gray-600 max-w-2xl mx-1 text-center font-bold">
                 রেজিস্ট্রেশন বাধ্যতামূলক নয়।
             </p>
 
         </div>
 
-        <div class="mt-8 max-w-full sm:max-w-2xl mx-auto">
-            <input type="hidden" id="fileSizeLimit" value="@ViewBag.fileSizeLimit" />
-            <input type="hidden" id="fileLimit" value="@ViewBag.fileLimit" />
+        <div class="mt-2 max-w-full sm:max-w-2xl mx-auto">
+            <input type="hidden" id="fileSizeLimit" value="@Model.fileLimit?.fileLimits?.FirstOrDefault()?.dayFileSize" />
+            <input type="hidden" id="fileLimit" value="@Model.fileLimit?.fileLimits?.FirstOrDefault()?.dayFileNo" />
             <form asp-action="Index" asp-controller="Home" asp-area="Home" method="POST" enctype="multipart/form-data" class="relative">
                 <input type="hidden" id="cId" value="@DropSpace.Helpers.IdMasking.Encode("1")"/>
                 <!-- Personal Information Section -->
@@ -42,17 +42,23 @@
                             <label for="name" class="block text-sm font-medium text-gray-700">ঘটনার ধরণ</label>
                             <select id="type" name="typeId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="" selected>নির্বাচন করুন</option>
-                                @foreach (var item in ViewBag.type)
+                                @foreach (var item in Model.type)
                                 {
                                     <option value="@item.Id">@item.crimeTypeNameBn</option>
                                 }
                             </select>
                         </div>
                         <div>
-                            <label for="division" class="block text-sm font-medium text-gray-700">বিভাগ</label>
-                            <select id="division" name="divisionId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
-                                <option value="" selected>বিভাগ নির্বাচন করুন</option>
-                            </select>
+                            <label for="dateOf" class="block text-sm font-medium text-gray-700">তারিখ</label>
+                            <input type="date" name="dateOf" required id="dateOf" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" />
+                        </div>
+                        <div>
+                            <label for="timeOf" class="block text-sm font-medium text-gray-700">সময়</label>
+                            <input type="text" readonly required name="timeOf" id="timeOf" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" />
+                        </div>
+                        <div>
+                            <label for="crimeName" class="block text-sm font-medium text-gray-700">ঘটনার টাইটেল</label>
+                            <input type="text" name="crimeName" id="crimeName" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" />
                         </div>
                         <div>
                             <label for="district" class="block text-sm font-medium text-gray-700">জেলা</label>
@@ -77,6 +83,11 @@
                             <select id="village" name="villageId" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" disabled>
                                 <option value="" selected>গ্রাম নির্বাচন করুন</option>
                             </select>
+                        </div>
+                        <div>
+                            <label for="locationText" class="block text-sm font-medium text-gray-700">স্থান এর তথ্য দিন</label>
+                            <textarea id="locationText" name="locationText" rows="5" required cols="40" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="সনাক্তের জন্য স্থান এর তথ্য দিন"></textarea>
+
                         </div>
                     </div>
                 </div>
@@ -103,7 +114,7 @@
                         আপনার আপলোডকৃত তথ্য দেখতে মোবাইল নম্বর যোগ করুন।
                     </p>
 
-                    <div id="mobileSection" class="mt-4 @(ViewBag.userName != null && ViewBag.userName != "" ? "" : "")">
+                    <div id="mobileSection" class="mt-4 @(Model.userName != null && Model.userName != "" ? "" : "")">
                         <label for="mobileNumber" class="block text-sm font-medium text-gray-700">মোবাইল নম্বর</label>
                         <div class="flex items-center">
                             <input type="text"
@@ -111,17 +122,17 @@
                                    name="mobile"
                                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                                    placeholder="আপনার মোবাইল নম্বর লিখুন"
-                                   value="@ViewBag.userName"
+                                   value="@Model.userName"
                                    required
-                            @(ViewBag.userName != null && ViewBag.userName != "" ? "disabled" : "")>
+                            @(Model.userName != null && Model.userName != "" ? "disabled" : "")>
 
-                            @if (ViewBag.userName != null && ViewBag.userName != "")
+                            @if (Model.userName != null && Model.userName != "")
                             {
-                                <input type="hidden" name="mobile" value="@(ViewBag.userName != null ? IdMasking.Decode(ViewBag.userName.ToString()) : "")">
+                                <input type="hidden" name="mobile" value="@(Model.userName != null ?DropSpace.Helpers.IdMasking.Decode(Model.userName.ToString()) : "")">
                             }
 
                             <button type="button"
-                                    class="ml-1 text-blue-500 hover:underline w-50 @(ViewBag.userName != null && ViewBag.userName != "" ? "hidden" : "")"
+                                    class="ml-1 text-blue-500 hover:underline w-50 @(Model.userName != null && Model.userName != "" ? "hidden" : "")"
                                     id="sendOTPButton">
                                 ওটিপি পাঠান
                             </button>
@@ -165,6 +176,8 @@
 </div>
 
 @section Scripts {
+    <link href="~/css/mdtimepicker.css" rel="stylesheet" type="text/css" />
+    <script src="~/js/mdtimepicker.js"></script>
     <script>
         var token = $('input[name="__RequestVerificationToken"]').val();
         let MAX_FILE_SIZE;
@@ -172,12 +185,13 @@
         let MAX_FILE_SIZE_MB_BANGLA
         let MAX_TOTAL_FILES_BANGLA
         $(document).ready(function () {
-            ;
-            if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName'!='null') {
+            $('#timeOf').mdtimepicker();
+
+            if ('@Model.userName' != null && '@Model.userName' != '' && '@Model.userName' != 'null') {
                 $('.active').removeClass('active');
                 $('#upload').addClass('active');
 
-                $('#mobileNumber').val('@(ViewBag.userName != null ? IdMasking.Decode(ViewBag.userName.ToString()) : "")');
+                $('#mobileNumber').val('@(Model.userName != null ? DropSpace.Helpers.IdMasking.Decode(Model.userName.ToString()) : "")');
                 $('#mobileNumber').prop('disabled', true);
                 $('#sendOTPButton').addClass('hidden');
                 $('#otpSection').addClass('hidden');
@@ -199,33 +213,30 @@
                 "persons_data_saved_no_files": "পিপলস ডেটা সফলভাবে সংরক্ষিত হয়েছে, কিন্তু কোনো ফাইল আপলোড হয়নি।",
                 "warning_files": "ফাইলগুলি সংরক্ষণ করা হয়নি: "
             };
-            console.log('Ok')
-            console.log('@ViewBag.MessageType')
-            console.log('@ViewBag.Message')
             // Check for success, error or warning messages
-            if ("@ViewBag.MessageType" === "success" && "@ViewBag.Message" !== "") {
+            if ("@Model.MessageType" === "success" && "@Model.Message" !== "") {
                 Swal.fire({
                     icon: 'success',
                     title: 'সাফল্য',
-                    text: messageMap["@ViewBag.Message"],
+                    text: messageMap["@Model.Message"],
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#3085d6'
                 });
             }
-            else if ("@ViewBag.MessageType" === "error" && "@ViewBag.Message" !== "") {
+            else if ("@Model.MessageType" === "error" && "@Model.Message" !== "") {
                 Swal.fire({
                     icon: 'error',
                     title: 'ত্রুটি',
-                    text: messageMap["@ViewBag.Message"],
+                    text: messageMap["@Model.Message"],
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#3085d6'
                 });
             }
-            else if ("@ViewBag.MessageType" === "warning" && "@ViewBag.WarningMessage" !== "") {
+            else if ("@Model.MessageType" === "warning" && "@Model.WarningMessage" !== "") {
                 Swal.fire({
                     icon: 'warning',
                     title: 'সতর্কতা',
-                    text: messageMap["@ViewBag.Message"] + "@ViewBag.WarningMessage",
+                    text: messageMap["@Model.Message"] + "@Model.WarningMessage",
                     confirmButtonText: 'OK',
                     confirmButtonColor: '#3085d6'
                 });
@@ -241,10 +252,9 @@
                 }
             });
 
-            loadDivisions();
+            loadDistricts();
 
             // Event listeners
-            $('#division').change(loadDistricts);
             $('#district').change(loadThanas);
             $('#thana').change(loadUnions);
             $('#union').change(loadVillages);
@@ -267,37 +277,10 @@
             console.log('total file ' + MAX_TOTAL_FILES)
         });
 
-        function loadDivisions() {
-            
-            var data = { cId: $('#cId').val() };
-            $.ajax({
-                url: `/api/Home/Home/GetDivisionByCountryId`,
-                type: 'POST',
-                data: JSON.stringify(data),
-                processData: false,
-                contentType: 'application/json',
-                headers: {
-                    'RequestVerificationToken': token
-                },
-                success: function (data) {
-                    populateDropdown('#division', data, 'divisionNameBn', 'Id');
-                    resetDependentDropdowns(['#district', '#thana', '#union', '#village']);
-                },
-                error: function () {
-                    alert('Error loading divisions.');
-                }
-            });
-        }
-
         function loadDistricts() {
-            const divisionId = $('#division').val();
-            if (!divisionId) return;
-            var data = { dId: divisionId };
-            console.log(data)
             $.ajax({
-                url: `/api/Home/Home/GetDistrictByDivisionId`,
+                url: `/api/Home/Home/GetAllDistrict`,
                 type: 'POST',
-                data: JSON.stringify(data),
                 processData: false,
                 contentType: 'application/json',
                 headers: {
@@ -519,9 +502,9 @@
                 $('#village').val() &&
                 $('#fileList .flex').length > 0;
 
-            const hasPrefilledMobile = '@ViewBag.userName' != null &&
-                '@ViewBag.userName' != '' &&
-                '@ViewBag.userName' != 'null';
+            const hasPrefilledMobile = '@Model.userName' != null &&
+                '@Model.userName' != '' &&
+                '@Model.userName' != 'null';
             const otpVerified = $('#verifyOTPButtonSuccess').is(':visible');
 
             // Show submit button only if all validations pass

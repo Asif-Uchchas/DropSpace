@@ -46,6 +46,10 @@
     public class PersonsDataViewModel
     {
         public string? typeId { get; set; }
+        public DateTime? dateOf { get; set; }
+        public string? timeOf { get; set; }
+        public string? crimeName { get; set; }
+        public string? locationText { get; set; }
         public string? latitude { get; set; }
         public string? longitude { get; set; }
         public string? mobile { get; set; }

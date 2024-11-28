@@ -11,6 +11,7 @@ using DropSpace.Services.Filehandling.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic.FileIO;
+using System;
 using System.Diagnostics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -24,8 +25,7 @@ namespace DropSpace.Areas.Home.Controllers
         private readonly IMasterData _masterdata;
         private readonly IGenericRepository<CrimeInfo> _repoCrimeInfo;
         private readonly IFileHandlingService _fileHandlingService;
-        //private const long MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
-        //private const int MAX_TOTAL_FILES = 1; 
+        private static Random random = new Random();
 
         public HomeController(IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment, IFileHandlingService fileHandlingService)
         {
@@ -39,18 +39,18 @@ namespace DropSpace.Areas.Home.Controllers
 
         public async Task<IActionResult> Index(string? userName)
         {
-            ViewBag.userName = userName;
             var crimeType = await _repoCrimeInfo.FindAll();
-            var uploadSettings = await _fileHandlingService.GetFileUploadSettingsAsync();
-            var fileLimit = uploadSettings.fileLimits.FirstOrDefault();
-            ViewBag.type = crimeType.Select(x => new CrimeTypeViewModel
+            var model = new IndexViewModel
             {
-                Id = IdMasking.Encode(x.Id.ToString()),
-                crimeTypeNameBn=x.crimeType
-            });
-            ViewBag.fileLimit = fileLimit?.dayFileNo;
-            ViewBag.fileSizeLimit = fileLimit?.dayFileSize;
-            return View();
+                userName= userName,
+                fileLimit= await _fileHandlingService.GetFileUploadSettingsAsync(),
+                type= crimeType.Select(x => new CrimeTypeViewModel
+                {
+                    Id = IdMasking.Encode(x.Id.ToString()),
+                    crimeTypeNameBn = x.crimeType
+                })
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -59,55 +59,57 @@ namespace DropSpace.Areas.Home.Controllers
         {
             var uploadSettings = await _fileHandlingService.GetFileUploadSettingsAsync();
             var crimeTypes = await _repoCrimeInfo.FindAll();
-            ViewBag.type = crimeTypes.Select(x => new CrimeTypeViewModel
+            var model = new IndexViewModel
             {
-                Id = IdMasking.Encode(x.Id.ToString()),
-                crimeTypeNameBn = x.crimeType
-            });
+                userName = IdMasking.Encode(personsData.mobile),
+                fileLimit = await _fileHandlingService.GetFileUploadSettingsAsync(),
+                type = crimeTypes.Select(x => new CrimeTypeViewModel
+                {
+                    Id = IdMasking.Encode(x.Id.ToString()),
+                    crimeTypeNameBn = x.crimeType
+                })
+            };
             if (string.IsNullOrWhiteSpace(personsData?.typeId) && (files == null || files.Count == 0))
             {
-                ViewBag.MessageType = "error";
-                ViewBag.Message = "invalid_input";
-                return View();
+                model.MessageType = "error";
+                model.Message = "invalid_input";
+                return View(model);
             }
 
             // Find the relevant file limit for the uploaded file type
             var fileType = uploadSettings.fileTypes.FirstOrDefault();
             if (fileType == null)
             {
-                ViewBag.MessageType = "error";
-                ViewBag.Message = "File type not found.";
-                return View();
+                model.MessageType = "error";
+                model.Message = "File type not found.";
+                return View(model);
             }
 
             var fileLimit = uploadSettings.fileLimits.FirstOrDefault(fl => fl.fileTypeId == fileType.fileTypeId);
             if (fileLimit == null)
             {
-                ViewBag.MessageType = "error";
-                ViewBag.Message = "File type limits not found.";
-                return View();
+                model.MessageType = "error";
+                model.Message = "File type limits not found.";
+                return View(model);
             }
 
             // Validate file count
             if (files.Count > fileLimit.totalFileNo)
             {
-                ViewBag.MessageType = "error";
-                ViewBag.Message = $"Too many files uploaded. Maximum allowed is {fileLimit.totalFileNo}.";
-                return View();
+                model.MessageType = "error";
+                model.Message = $"Too many files uploaded. Maximum allowed is {fileLimit.totalFileNo}.";
+                return View(model);
             }
 
             // Validate file sizes
-            foreach (var file in files)
+            if (files[0].Length > fileLimit.dayFileSize * 1024 * 1024) // Convert megabytes to bytes
             {
-                if (file.Length > fileLimit.dayFileSize * 1024 * 1024) // Convert megabytes to bytes
-                {
-                    ViewBag.MessageType = "error";
-                    ViewBag.Message = $"File {file.FileName} exceeds the maximum size of {fileLimit.totalFileSize} MB.";
-                    return View();
-                }
+                model.MessageType = "error";
+                model.Message = $"File {files[0].FileName} exceeds the maximum size of {fileLimit.totalFileSize} MB.";
+                return View(model);
             }
 
-            
+
             int crimeType = Convert.ToInt32(IdMasking.Decode(personsData?.typeId));
             int? unionId = personsData?.unionId != null ? (int?)Convert.ToInt32(IdMasking.Decode(personsData.unionId)) : null;
             int? villageId = personsData?.villageId != null ? (int?)Convert.ToInt32(IdMasking.Decode(personsData.villageId)) : null;
@@ -122,7 +124,7 @@ namespace DropSpace.Areas.Home.Controllers
             };
             int personsDataId = await _persondata.AddPersonsDataAsync(personalData);
 
-            if (files != null && files.Count > 0)
+            if (files != null && files.Count ==0)
             {
                 string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "ufile");
                 if (!Directory.Exists(uploadFolder))
@@ -133,22 +135,35 @@ namespace DropSpace.Areas.Home.Controllers
                 List<string> warningFiles = new List<string>();
                 List<UploadedFiles> uploadedFilesList = new List<UploadedFiles>();
 
-                foreach (var file in files)
+                string filePath = Path.Combine(uploadFolder, files[0].FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    // Save all file types
-                    string filePath = Path.Combine(uploadFolder, file.FileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    uploadedFilesList.Add(new UploadedFiles
-                    {
-                        personsDataId = personsDataId,
-                        crimeTypeId = crimeType,
-                        attachmentUrl = Path.Combine("ufile", file.FileName)
-                    });
+                    await files[0].CopyToAsync(stream);
                 }
+                int leng = 2;
+                string shortUrl = "";
+                bool chUrl =false;
+                for (int i = 0; i < leng && chUrl==false; i++)
+                {
+                    var sUrl = RandomString(15);
+                    var checkUrl = await _persondata.CheckShortUrl(sUrl);
+                    if (!checkUrl)
+                    {
+                        chUrl=false;
+                    }
+                    else
+                    {
+                        shortUrl = sUrl;
+                        chUrl = true;
+                    }
+                }
+                uploadedFilesList.Add(new UploadedFiles
+                {
+                    personsDataId = personsDataId,
+                    crimeTypeId = crimeType,
+                    attachmentUrl = Path.Combine("ufile", files[0].FileName),
+                    shortUrl= shortUrl,
+                });
 
                 if (uploadedFilesList.Any())
                 {
@@ -156,20 +171,20 @@ namespace DropSpace.Areas.Home.Controllers
                     await _persondata.AddUploadedFilesAsync(uploadedFilesList);
                 }
 
-                ViewBag.MessageType = "success";
-                ViewBag.Message = "data_uploaded_successfully";
+                model.MessageType = "success";
+                model.Message = "data_uploaded_successfully";
             }
             else
             {
-                ViewBag.MessageType = "success";
-                ViewBag.Message = "persons_data_saved_no_files";
+                model.MessageType = "success";
+                model.Message = "persons_data_saved_no_files";
             }
 
             if (personsData.mobile != null && personsData.mobile != "")
             {
-                ViewBag.userName = IdMasking.Encode(personsData.mobile);
+                model.userName = IdMasking.Encode(personsData.mobile);
             }
-            return View();
+            return View(model);
         }
 
         
@@ -189,6 +204,18 @@ namespace DropSpace.Areas.Home.Controllers
             }));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> GetAllDistrict()
+        {
+            var data = await _masterdata.GetAllDistrict();
+            return Json(data.Select(x => new DistrictViewModel
+            {
+                districtNameBn = x.districtNameBn,
+                Id = IdMasking.Encode(x.Id.ToString())
+            }));
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("api/[area]/[controller]/[action]")]
@@ -302,7 +329,12 @@ namespace DropSpace.Areas.Home.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
+        public static string RandomString(int length)
+        {
+            const string chars = "ABCDEFGHJKMNPQRSTVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
         //[HttpPost]
         //[RequestSizeLimit(2147483648)] // 2GB limit
         //public async Task<IActionResult> Index([FromForm] PersonsDataViewModel personsData, [FromForm] IFormFileCollection files)

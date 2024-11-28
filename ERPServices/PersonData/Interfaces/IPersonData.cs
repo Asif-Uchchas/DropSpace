@@ -11,5 +11,6 @@ namespace DropSpace.ERPServices.PersonData.Interfaces
         Task<Dictionary<int, int>> GetHourlyDataCountAsync(DateTime date);
         Task<Dictionary<DateTime, int>> GetDailyDataCountAsync(DateTime startDate, DateTime endDate);
         Task<List<PersonDataWithFilesDto>> GetPersonDataWithFilesAsync(DateTime date, int? hour = null);
+        Task<bool> CheckShortUrl(string url);
     }
 }

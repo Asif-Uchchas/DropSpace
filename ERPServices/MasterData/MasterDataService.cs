@@ -21,6 +21,10 @@ namespace DropSpace.ERPServices.MasterData
         {
             return await _context.divisions.Where(X => X.countryId == CntId).ToListAsync();
         }
+        public async Task<IEnumerable<District>> GetAllDistrict()
+        {
+            return await _context.districts.ToListAsync();
+        }
         public async Task<IEnumerable<District>> GetDistrictsByDivisonId(int DivisionId)
         {
             return await _context.districts.Where(X => X.divisionId == DivisionId).ToListAsync();

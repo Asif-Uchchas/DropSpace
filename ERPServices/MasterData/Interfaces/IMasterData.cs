@@ -6,6 +6,7 @@ namespace DropSpace.ERPServices.MasterData.Interfaces
     {
         Task<IEnumerable<Country>> GetAllCountries();
         Task<IEnumerable<Division>> GetDivisionsByCountryId(int CntId);
+        Task<IEnumerable<District>> GetAllDistrict();
         Task<IEnumerable<District>> GetDistrictsByDivisonId(int DivisionId);
         Task<IEnumerable<Thana>> GetThanasByDistrictId(int DistrictId);
         Task<IEnumerable<Thana>> GetActiveThanasByDistrictId(int DistrictId);

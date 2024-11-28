@@ -36,7 +36,7 @@ namespace DropSpace.ERPServices.PersonData
                 .Select(p => new PersonDataWithFilesDto
                 {
                     Id = p.Id,
-                    Name = p.name,
+                    //Name = p.crimeName,
                     Mobile = p.mobile,
                     UnionId = p.unionId,
                     UnionName = p.union != null ? p.union.unionName : null,
@@ -157,7 +157,7 @@ namespace DropSpace.ERPServices.PersonData
             var data = personData.Select(p => new PersonDataWithFilesDto
             {
                 Id = p.Id,
-                Name = p.name,
+                //Name = p.name,
                 Mobile = p.mobile,
                 UnionId = p.unionId,
                 UnionName = p.union?.unionName,
@@ -177,7 +177,14 @@ namespace DropSpace.ERPServices.PersonData
             return data;
         }
 
-
-
+        public async Task<bool> CheckShortUrl(string url)
+        {
+            var c=await _context.uploadedFiles.Where(x=>x.shortUrl==url).FirstOrDefaultAsync();
+            if (c != null)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }
