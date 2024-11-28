@@ -48,8 +48,8 @@ namespace DropSpace.Areas.Home.Controllers
                 Id = IdMasking.Encode(x.Id.ToString()),
                 crimeTypeNameBn=x.crimeType
             });
-            ViewBag.fileLimit = fileLimit.dayFileNo;
-            ViewBag.fileSizeLimit = fileLimit.dayFileSize;
+            ViewBag.fileLimit = fileLimit?.dayFileNo;
+            ViewBag.fileSizeLimit = fileLimit?.dayFileSize;
             return View();
         }
 

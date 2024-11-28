@@ -165,8 +165,10 @@
 @section Scripts {
     <script>
         var token = $('input[name="__RequestVerificationToken"]').val();
+        let MAX_FILE_SIZE;
+        let MAX_TOTAL_FILES;
         $(document).ready(function () {
-            debugger;
+            ;
             if ('@ViewBag.userName' != null && '@ViewBag.userName' != '' && '@ViewBag.userName'!='null') {
                 $('.active').removeClass('active');
                 $('#upload').addClass('active');
@@ -253,11 +255,14 @@
             // Setup OTP input handling
             setupOTPInputs();
 
-            const MAX_FILE_SIZE = @ViewBag.fileSizeLimit * 1024 * 1024;
-            const MAX_TOTAL_FILES = @ViewBag.fileLimit;
+            const MAX_FILE_SIZE = parseInt('@ViewBag.fileSizeLimit') * 1024 * 1024;
+            const MAX_TOTAL_FILES = parseInt('@ViewBag.fileLimit');
+            console.log(MAX_FILE_SIZE)
+            console.log(MAX_TOTAL_FILES)
         });
 
         function loadDivisions() {
+            
             var data = { cId: $('#cId').val() };
             $.ajax({
                 url: `/api/Home/Home/GetDivisionByCountryId`,
@@ -412,6 +417,7 @@
 
 
         function handleFiles(event) {
+            debugger
             const files = event.target.files;
 
             
@@ -525,7 +531,7 @@
         }
 
         function sendOTP() {
-            debugger
+            
             const mobileNumber = $('#mobileNumber').val();
             if (!/^01[3-9]\d{8}$/.test(mobileNumber)) {
                 Swal.fire({
@@ -568,7 +574,7 @@
         }
 
         function verifyOTP() {
-            debugger
+            
             const otp = $('#otpInputs input').map(function () { return $(this).val(); }).get().join('');
             const mobileNumber = $('#mobileNumber').val();
 
