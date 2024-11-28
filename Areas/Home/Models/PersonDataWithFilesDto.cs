@@ -12,6 +12,8 @@
         public string? VillageName { get; set; }
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }
+        public string? otp { get; set; }
+        public string? otpMsk { get; set; }
         public DateTime? createdAt { get; set; }
         public List<UploadedFileDto>? UploadedFiles { get; set; }
     }

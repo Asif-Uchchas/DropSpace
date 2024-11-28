@@ -80,6 +80,36 @@
 
 @section Scripts {
     <script>
+        $(document).ready(function () {
+            debugger
+                var mobile = '@ViewBag.userName';
+                var otp = '@ViewBag.otp';
+
+                
+                $.ajax({
+                url: '/Auth/Account/IsTheSamePerson',
+                type: 'POST',
+                    data: {
+                        mobile: mobile,
+                        otp: otp
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("Same person and " + response.message);
+                            
+                        } else {
+                            window.location.href = '/Auth/Account/MobileLogin';
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error occurred: " + error);
+                        alert("An error occurred while validating the OTP.");
+                    }
+                });
+            
+
+        });
+
         document.addEventListener('DOMContentLoaded', function () {
             // Filter functionality
             const filterButtons = document.querySelectorAll('.filter-btn');
