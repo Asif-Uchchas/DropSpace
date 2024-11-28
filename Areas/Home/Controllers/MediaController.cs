@@ -21,9 +21,10 @@ namespace DropSpace.Areas.Home.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-        public async Task<IActionResult> Index(string mobile)
+        public async Task<IActionResult> Index(string mobile, string otp)
         {
             ViewBag.userName=mobile;
+            ViewBag.otp=otp;
             var model = new MediaViewModel
             {
                 Files = new List<MediaFileViewModel>()
@@ -31,7 +32,7 @@ namespace DropSpace.Areas.Home.Controllers
 
             if (!string.IsNullOrWhiteSpace(mobile))
             {
-                var personData = await _persondata.GetPersonDataWithFilesByMobileAsync(IdMasking.Decode(mobile));
+                var personData = await _persondata.GetPersonDataWithFilesByMobileAsync(IdMasking.Decode(mobile), IdMasking.Decode(otp));
                 foreach (var item0 in personData)
                 {
                     foreach (var item1 in item0.UploadedFiles)
@@ -60,7 +61,7 @@ namespace DropSpace.Areas.Home.Controllers
         [Route("api/[area]/[controller]/[action]")]
         public async Task<IActionResult> GetPersonDataByMobile([FromBody] MasterDataViewModel model)
         {
-            var personData = await _persondata.GetPersonDataWithFilesByMobileAsync(model.mId);
+            var personData = await _persondata.GetPersonDataWithFilesByMobileAsync(model.mId, model.otp);
             if (personData == null)
             {
                 return NotFound(new { message = "No person data found for the provided mobile number." });

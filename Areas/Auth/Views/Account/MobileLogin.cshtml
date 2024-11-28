@@ -65,9 +65,38 @@
             $('#resendOTPButton').click(sendOTP);
             $('#proceedButton').click(proceedToNextStep);
 
+            // Reset OTP fields when mobile number changes
+            $('#mobileNumber').on('input', function () {
+                resetOTPFields();
+            });
+
+
             // OTP Input Handling
             setupOTPInputHandling();
         });
+
+        function resetOTPFields() {
+            // Clear OTP inputs
+            $('#otpInputs input').val('');
+
+            // Hide OTP section and show resend button
+            $('#otpSection').addClass('hidden');
+            $('#resendOTPButton').addClass('hidden').prop('disabled', true);
+
+            // Hide the proceed button
+            $('#actionButtonSection').addClass('hidden');
+            $('#proceedButton').addClass('hidden');
+
+            // Show the send OTP button
+            $('#sendOTPButton').removeClass('hidden');
+
+            // Reset the verify OTP button
+            $('#verifyOTPButton')
+                .text('ওটিপি যাচাই করুন') // Reset text to original
+                .prop('disabled', false) // Enable the button
+                .removeClass('text-green-600 cursor-not-allowed') // Remove disabled styles
+                .addClass('text-blue-500 hover:underline'); // Add original styles
+        }
 
         function setupOTPInputHandling() {
             $(document).on('input', '#otpInputs input', function(e) {
@@ -154,7 +183,7 @@
                 data: JSON.stringify({ mobileNumber, otp }),
                 success: function () {
                     $('#actionButtonSection').removeClass('hidden');
-
+                    $('#proceedButton').removeClass('hidden'); // Ensure proceed button is visible
                     // Replace the verify button text and disable it
                     $('#verifyOTPButton')
                         .text('যাচাই সফল হয়েছে')
@@ -198,7 +227,12 @@
         }
 
         function proceedToNextStep() {
-            var data = {mId: $('#mobileNumber').val() };
+            var mobileNumber = $('#mobileNumber').val();
+            var otp = $('#otpInputs input').map(function () { return $(this).val(); }).get().join('');
+            var data = {
+                mId: mobileNumber,
+                otp: otp 
+            };
             $.ajax({
                 url: `/api/Home/Media/GetPersonDataByMobile`,
                 type: 'POST',
@@ -210,7 +244,7 @@
                 },
                 success: function (response) {
                     if (response && Object.keys(response).length > 0) {
-                        window.location.href = `/Home/Media/Index?mobile=${response[0].mobileMsk}`;
+                        window.location.href = `/Home/Media/Index?mobile=${response[0].mobileMsk}&otp=${response[0].otpMsk} `;
                     } else {                        
                         Swal.fire({
                             icon: 'info',

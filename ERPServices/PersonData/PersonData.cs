@@ -30,7 +30,7 @@ namespace DropSpace.ERPServices.PersonData
             _context.uploadedFiles.AddRange(uploadedFiles);
             await _context.SaveChangesAsync();
         }
-        public async Task<List<PersonDataWithFilesDto>> GetPersonDataWithFilesByMobileAsync(string mobile)
+        public async Task<List<PersonDataWithFilesDto>> GetPersonDataWithFilesByMobileAsync(string mobile, string otp)
         {
             var personDataList = await _context.personalDatas.Where(p => p.mobile == mobile)
                 .Select(p => new PersonDataWithFilesDto
@@ -44,8 +44,10 @@ namespace DropSpace.ERPServices.PersonData
                     VillageName = p.village != null ? p.village.villageName : null,
                     Latitude = p.latitude,
                     Longitude = p.longitude,
+                    otp = otp,
                     createdAt=p.createdAt,
                     mobileMsk=IdMasking.Encode(mobile),
+                    otpMsk=IdMasking.Encode(otp),
                     UploadedFiles = new List<UploadedFileDto>()
                 })
                 .ToListAsync();
@@ -76,6 +78,22 @@ namespace DropSpace.ERPServices.PersonData
             }
 
             return personDataList;
+        }
+        public async Task<bool> IsTheSamePerson(string mobile, string otp)
+        {
+            
+            var lastOtpEntry = await _context.oTPLogs
+                .Where(p => p.userName == mobile)
+                .OrderByDescending(p => p.createdAt)
+                .FirstOrDefaultAsync();
+
+            
+            if (lastOtpEntry != null && lastOtpEntry.otp == otp)
+            {
+                return true; 
+            }
+
+            return false; // No matching OTP found for the provided mobile number
         }
 
         public async Task<Dictionary<int, int>> GetHourlyDataCountAsync(DateTime date)

@@ -1,13 +1,17 @@
 ﻿using DropSpace.Areas.Auth.Models;
+using DropSpace.Areas.Home.Models;
 using DropSpace.Data.Entity;
 using DropSpace.Data.Entity.LogInfo;
 using DropSpace.Data.Entity.MasterData;
 using DropSpace.ERPService.AuthService.Interfaces;
 using DropSpace.ERPServices.MobilePhoneValidation;
 using DropSpace.ERPServices.MobilePhoneValidation.Interfaces;
+using DropSpace.ERPServices.PersonData.Interfaces;
+using DropSpace.Helpers;
 using DropSpace.Repository.Contracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +19,10 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using Newtonsoft.Json;
 using System.Drawing;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DropSpace.Areas.Auth.Controllers
 {
@@ -28,17 +34,19 @@ namespace DropSpace.Areas.Auth.Controllers
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IMobilePhoneValidation _mobilePhoneValidation;
         private readonly IUserInfoes userInfoes;
+        private readonly IPersonData _persondata;
 
         private const string FIXED_OTP = "123456";
         private static readonly Dictionary<string, string> _otpStorage = new Dictionary<string, string>();
         private static readonly Regex _mobileRegex = new Regex(@"^01[3-9]\d{8}$");
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager, IUserInfoes userInfoes, IMobilePhoneValidation mobilePhoneValidation
+        public AccountController(UserManager<ApplicationUser> userManager, IPersonData persondata, SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager, IUserInfoes userInfoes, IMobilePhoneValidation mobilePhoneValidation
             )
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _mobilePhoneValidation = mobilePhoneValidation;
+            _persondata = persondata;
             this.userInfoes = userInfoes;
         }
 
@@ -102,7 +110,31 @@ namespace DropSpace.Areas.Auth.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> IsTheSamePerson(string mobile, string otp)
+        {
+            // Check if the mobile number is provided
+            if (!string.IsNullOrWhiteSpace(mobile))
+            {
+                // Validate the OTP against the last requested OTP for the mobile number
+                bool isValidOtp = await _persondata.IsTheSamePerson(IdMasking.Decode(mobile), IdMasking.Decode(otp));
 
+                if (isValidOtp)
+                {
+                    // Return a success response if the OTP is valid
+                    return Json(new { success = true, message = "OTP is valid." });
+                }
+                else
+                {
+                    // Return a response indicating the OTP is invalid
+                    return Json(new { success = false, message = "Invalid OTP." });
+                }
+            }
+
+            // Return a response indicating the mobile number is not provided
+            return Json(new { success = false, message = "Mobile number is required." });
+        }
 
         [AllowAnonymous]
         public async Task<IActionResult> MobileLogin(string returnUrl = null)
@@ -437,8 +469,19 @@ namespace DropSpace.Areas.Auth.Controllers
                     return BadRequest(new { success = false, message = "Invalid mobile number format" });
                 }
 
-                // Generate OTP (you can generate a real OTP here)
-                string otp = FIXED_OTP; // For example purposes, a fixed OTP
+
+                // Generate a 6-digit OTP
+                byte[] randomBytes = new byte[4];  // Use 4 bytes for a 6-digit OTP
+                using (var rng = RandomNumberGenerator.Create())
+                {
+                    rng.GetBytes(randomBytes); // Fill the byte array with random bytes
+                }
+
+                // Convert the byte array to a 32-bit unsigned integer
+                uint otpValue = BitConverter.ToUInt32(randomBytes, 0);
+
+                // Ensure the OTP is always 6 digits by using modulus
+                string otp = (otpValue % 1000000).ToString("D6");
 
                 // Call the service method to log OTP
                 bool otpSent = await _mobilePhoneValidation.SendOTP(mobileNumber, otp);

@@ -7,6 +7,7 @@
         public string? tId { get; set; }
         public string? uId { get; set; }
         public string? mId { get; set; }
+        public string? otp { get; set; }
     }
     public class CountryViewModel
     {
