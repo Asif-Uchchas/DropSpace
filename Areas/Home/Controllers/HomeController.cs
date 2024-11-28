@@ -2,6 +2,7 @@
 using DropSpace.Data.Entity.Droper;
 using DropSpace.Data.Entity.MasterData;
 using DropSpace.ERPServices.MasterData.Interfaces;
+using DropSpace.ERPServices.MobilePhoneValidation.Interfaces;
 using DropSpace.ERPServices.PersonData;
 using DropSpace.ERPServices.PersonData.Interfaces;
 using DropSpace.Helpers;
@@ -11,8 +12,10 @@ using DropSpace.Services.Filehandling.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic.FileIO;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System;
 using System.Diagnostics;
+using static System.Net.WebRequestMethods;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DropSpace.Areas.Home.Controllers
@@ -23,23 +26,29 @@ namespace DropSpace.Areas.Home.Controllers
         private readonly IPersonData _persondata;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMasterData _masterdata;
+        private readonly IMobilePhoneValidation _mobilePhoneValidation;
         private readonly IGenericRepository<CrimeInfo> _repoCrimeInfo;
         private readonly IFileHandlingService _fileHandlingService;
         private static Random random = new Random();
 
-        public HomeController(IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment, IFileHandlingService fileHandlingService)
+        public HomeController(IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment, IFileHandlingService fileHandlingService, IMobilePhoneValidation mobilePhoneValidation)
         {
             _persondata = persondata;
             _webHostEnvironment = webHostEnvironment;
             _masterdata = masterData;
             _repoCrimeInfo = repoCrimeInfo;
             _fileHandlingService = fileHandlingService;
+            _mobilePhoneValidation = mobilePhoneValidation;
         }
 
 
         public async Task<IActionResult> Index(string? userName)
         {
             var crimeType = await _repoCrimeInfo.FindAll();
+            if (userName != null && userName != "")
+            {
+                ViewBag.otp = await _mobilePhoneValidation.GetUserOtp(IdMasking.Decode(userName));
+            }
             var model = new IndexViewModel
             {
                 userName= userName,
@@ -122,10 +131,14 @@ namespace DropSpace.Areas.Home.Controllers
                 mobile = personsData.mobile,
                 unionId = unionId,
                 villageId = villageId,
+                crimeName= personsData.crimeName,
+                crimePlace= personsData.locationText,
+                crimeDate = personsData.dateOf,
+                crimeTime = personsData.timeOf,
             };
             int personsDataId = await _persondata.AddPersonsDataAsync(personalData);
 
-            if (files != null && files.Count ==0)
+            if (files != null && files.Count ==1)
             {
                 string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "ufile");
                 if (!Directory.Exists(uploadFolder))
@@ -184,6 +197,7 @@ namespace DropSpace.Areas.Home.Controllers
             if (personsData.mobile != null && personsData.mobile != "")
             {
                 model.userName = IdMasking.Encode(personsData.mobile);
+                ViewBag.otp = await _mobilePhoneValidation.GetUserOtp(personsData.mobile);
             }
             return View(model);
         }

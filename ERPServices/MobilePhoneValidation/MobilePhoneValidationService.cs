@@ -1,6 +1,7 @@
 ﻿using DropSpace.Context;
 using DropSpace.Data.Entity.LogInfo;
 using DropSpace.ERPServices.MobilePhoneValidation.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace DropSpace.ERPServices.MobilePhoneValidation
 {
@@ -74,6 +75,11 @@ namespace DropSpace.ERPServices.MobilePhoneValidation
                 
                 return false;
             }
+        }
+        public async Task<string> GetUserOtp(string mobileNumber)
+        {
+            var otp = await _context.oTPLogs.Where(x => x.userName == mobileNumber && x.isVerified == true && x.otpExpire.Value.Date == DateTime.Now.Date).OrderBy(x => x.Id).LastOrDefaultAsync();
+            return otp.otp;
         }
     }
 }
