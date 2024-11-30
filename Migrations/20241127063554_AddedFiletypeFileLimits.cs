@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DropZone_BackPanel.Migrations
+namespace DropSpace.Migrations
 {
     /// <inheritdoc />
     public partial class AddedFiletypeFileLimits : Migration
