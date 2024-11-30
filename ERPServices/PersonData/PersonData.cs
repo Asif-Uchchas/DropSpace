@@ -209,5 +209,9 @@ namespace DropSpace.ERPServices.PersonData
             }
             return true;
         }
+        public async Task<UploadedFiles> GetUrlFromShortUrl(string url)
+        {
+            return await _context.uploadedFiles.Where(x => x.shortUrl == url).FirstOrDefaultAsync();
+        }
     }
 }

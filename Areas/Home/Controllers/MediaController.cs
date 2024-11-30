@@ -15,17 +15,19 @@ namespace DropSpace.Areas.Home.Controllers
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IPersonData _persondata;
+        private static string rootPath;
 
-        public MediaController(IPersonData persondata,IWebHostEnvironment webHostEnvironment)
+        public MediaController(IPersonData persondata, IWebHostEnvironment webHostEnvironment)
         {
             _persondata = persondata;
             _webHostEnvironment = webHostEnvironment;
+            rootPath = "D:\\FileManagement";
         }
-        [Authorize(Roles ="Public")]
+        [Authorize(Roles = "Public")]
         public async Task<IActionResult> Index(string mobile, string otp)
         {
-            ViewBag.userName=mobile;
-            ViewBag.otp=otp;
+            ViewBag.userName = mobile;
+            ViewBag.otp = otp;
             var model = new MediaViewModel
             {
                 Files = new List<MediaFileViewModel>()
@@ -49,10 +51,10 @@ namespace DropSpace.Areas.Home.Controllers
                                 // Use a web-accessible path
                                 Url = $"/{item1.AttachmentUrl}",
                                 FileType = GetFileType(item1.AttachmentUrl),
-                                crimeType=item1.crimeType.crimeType,
-                                shortUrl=item1.shortUrl,
-                                newFileName=item1.newFileName,
-                                oldFileName=item1.oldFileName
+                                crimeType = item1.crimeType.crimeType,
+                                shortUrl = item1.shortUrl,
+                                newFileName = item1.newFileName,
+                                oldFileName = item1.oldFileName
                             });
                         }
                     }
@@ -61,8 +63,10 @@ namespace DropSpace.Areas.Home.Controllers
 
             return View(model);
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Public")]
         [Route("api/[area]/[controller]/[action]")]
         public async Task<IActionResult> GetPersonDataByMobile([FromBody] MasterDataViewModel model)
         {
@@ -84,6 +88,30 @@ namespace DropSpace.Areas.Home.Controllers
                 ".pdf" => "pdf",
                 _ => "other"
             };
+        }
+
+        [Authorize(Roles = "Public")]
+        public async Task<IActionResult> StreamVideo(string link)
+        {
+            try
+            {
+                var file = await _persondata.GetUrlFromShortUrl(link);
+
+                var filePath = Path.Combine(rootPath, User.Identity.Name, file.attachmentUrl);
+
+                if (!System.IO.File.Exists(filePath))
+                {
+                    return NotFound("Video file not found.");
+                }
+
+                var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                return File(stream, "video/mp4", file.oldFileName);
+
+            }
+            catch (Exception)
+            {
+                return Json("You are not allowed");
+            }
         }
     }
 }

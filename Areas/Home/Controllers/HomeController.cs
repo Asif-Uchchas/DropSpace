@@ -34,6 +34,7 @@ namespace DropSpace.Areas.Home.Controllers
         private readonly IGenericRepository<CrimeInfo> _repoCrimeInfo;
         private readonly IFileHandlingService _fileHandlingService;
         private static Random random = new Random();
+        private static string rootPath;
 
         public HomeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment, IFileHandlingService fileHandlingService, IMobilePhoneValidation mobilePhoneValidation)
         {
@@ -45,6 +46,7 @@ namespace DropSpace.Areas.Home.Controllers
             _repoCrimeInfo = repoCrimeInfo;
             _fileHandlingService = fileHandlingService;
             _mobilePhoneValidation = mobilePhoneValidation;
+            rootPath = "D:\\FileManagement";
         }
 
 
@@ -78,6 +80,17 @@ namespace DropSpace.Areas.Home.Controllers
             var uploadSettings = await _fileHandlingService.GetFileUploadSettingsAsync();
             var fileLimits = uploadSettings.fileLimits.FirstOrDefault();
             var crimeTypes = await _repoCrimeInfo.FindAll();
+            var model = new IndexViewModel
+            {
+                userName = IdMasking.Encode(personsData.mobile),
+                fileLimit = await _fileHandlingService.GetFileUploadSettingsAsync(),
+                type = crimeTypes.Select(x => new CrimeTypeViewModel
+                {
+                    Id = IdMasking.Encode(x.Id.ToString()),
+                    crimeTypeNameBn = x.crimeType
+                })
+            };
+            #region User Handle
             var userName = User.Identity.Name;
             var user = new ApplicationUser();
             if (userName == null)
@@ -88,7 +101,7 @@ namespace DropSpace.Areas.Home.Controllers
             var lastOtp = await _mobilePhoneValidation.GetUserLastOtp(personsData.mobile);
             if (user == null && IdMasking.Decode(personsData.newId)== lastOtp)
             {
-                user = new ApplicationUser { UserName = personsData.mobile, userType = 1,isActive=0, createdAt = DateTime.Now, createdBy = "Otp Verified", isWhiteList = false };
+                user = new ApplicationUser { UserName = personsData.mobile, userType = 1,isActive=1, createdAt = DateTime.Now, createdBy = "Otp Verified", isWhiteList = false };
                 var result = await _userManager.CreateAsync(user, userName+"@#$%!@#$"+DateTime.Now.ToString("yyyyMMddHHmmss"));
                 if (result.Succeeded)
                 {
@@ -100,16 +113,7 @@ namespace DropSpace.Areas.Home.Controllers
             {
                 await _signInManager.SignInAsync(user, true);
             }
-            var model = new IndexViewModel
-            {
-                userName = IdMasking.Encode(personsData.mobile),
-                fileLimit = await _fileHandlingService.GetFileUploadSettingsAsync(),
-                type = crimeTypes.Select(x => new CrimeTypeViewModel
-                {
-                    Id = IdMasking.Encode(x.Id.ToString()),
-                    crimeTypeNameBn = x.crimeType
-                })
-            };
+            #endregion
             #region Validation
             if (string.IsNullOrWhiteSpace(personsData?.typeId) && (files == null || files.Count == 0))
             {
@@ -178,7 +182,7 @@ namespace DropSpace.Areas.Home.Controllers
             if (files != null && files.Count ==1)
             {
 
-                string uploadFolder = Path.Combine("D:\\FileManagement", personsData.mobile);
+                string uploadFolder = Path.Combine(rootPath, personsData.mobile);
                 if (!Directory.Exists(uploadFolder))
                 {
                     Directory.CreateDirectory(uploadFolder);

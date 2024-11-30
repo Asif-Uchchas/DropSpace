@@ -30,7 +30,7 @@
                     {
                         case "video":
                             <video class="w-full h-full object-cover cursor-pointer" controls preload="metadata">
-                                <source src="@file.Url" type="video/mp4">
+                                <source src="/Home/Media/StreamVideo?link=@file.shortUrl" type="video/mp4">
                             </video>
                             break;
 
@@ -64,10 +64,10 @@
                     }
                 </div>
                 <div class="p-3 border-t flex justify-between items-center">
-                    <span class="text-sm text-gray-600 truncate max-w-[60%]" title="@file.FileName">
-                        @file.FileName
+                    <span class="text-sm text-gray-600 truncate max-w-[60%]" title="@file.oldFileName">
+                        @file.oldFileName
                     </span>
-                    <a href="@file.Url"
+                    <a href="/Home/Media/StreamVideo?link=@file.shortUrl"
                        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
                        download>
                         Download
