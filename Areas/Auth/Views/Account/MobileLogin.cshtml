@@ -99,7 +99,7 @@
         }
 
         function setupOTPInputHandling() {
-            $(document).on('input', '#otpInputs input', function(e) {
+            $(document).on('input', '#otpInputs input', function (e) {
                 const $this = $(this);
                 const value = $this.val();
 
@@ -112,7 +112,7 @@
                 }
             });
 
-            $(document).on('keydown', '#otpInputs input', function(e) {
+            $(document).on('keydown', '#otpInputs input', function (e) {
                 if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Tab') {
                     e.preventDefault();
                 }
@@ -145,7 +145,7 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ mobileNumber }),
-                success: function() {
+                success: function () {
                     $('#otpSection').removeClass('hidden');
                     $('#resendOTPButton').addClass('hidden');
 
@@ -160,7 +160,7 @@
                         confirmButtonColor: '#3085d6'
                     });
                 },
-                error: function() {
+                error: function () {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -216,7 +216,7 @@
             const resendButton = $('#resendOTPButton');
             resendButton.text(`পুনরায় পাঠান (${countdown})`).prop('disabled', true);
 
-            const interval = setInterval(function() {
+            const interval = setInterval(function () {
                 countdown--;
                 resendButton.text(`পুনরায় পাঠান (${countdown})`);
                 if (countdown <= 0) {
@@ -231,10 +231,10 @@
             var otp = $('#otpInputs input').map(function () { return $(this).val(); }).get().join('');
             var data = {
                 mId: mobileNumber,
-                otp: otp 
+                otp: otp
             };
             $.ajax({
-                url: `/api/Home/Media/GetPersonDataByMobile`,
+                url: `/api/Auth/Account/Login`,
                 type: 'POST',
                 data: JSON.stringify(data),
                 processData: false,
@@ -244,8 +244,28 @@
                 },
                 success: function (response) {
                     if (response && Object.keys(response).length > 0) {
-                        window.location.href = `/Home/Media/Index?mobile=${response[0].mobileMsk}&otp=${response[0].otpMsk} `;
-                    } else {                        
+                        if (response.status == 'success') {
+                            window.location.href = `/Home/Media/Index?mobile=${response.mobileMask}&otp=${response.otpMask} `;
+                        }
+                        else if (response.status == 'noUser') {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'কোন ডেটা নেই',
+                                text: 'আপনি কোনো ফাইল আপলোড করেন নি।',
+                                confirmButtonText: 'ঠিক আছে',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+                        else if (response.status == 'lastOtpNotMatch') {
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'OTP Expire',
+                                text: 'আপনার নতুন ওটিপি ভেরিফাই করুন',
+                                confirmButtonText: 'ঠিক আছে',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+                    } else {
                         Swal.fire({
                             icon: 'info',
                             title: 'কোন ডেটা নেই',

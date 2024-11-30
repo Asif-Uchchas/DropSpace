@@ -6,6 +6,7 @@ namespace DropSpace.Data.Entity
     public class ApplicationUser : IdentityUser
     {
         public int? isActive { get; set; }
+        public bool? isWhiteList { get; set; }
         public DateTime? createdAt { get; set; }
         [MaxLength(120)]
         public string? createdBy { get; set; }

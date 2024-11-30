@@ -1,7 +1,9 @@
-﻿@model DropSpace.Areas.Home.Models.IndexViewModel;
+﻿@using DropSpace.Helpers
+@model DropSpace.Areas.Home.Models.IndexViewModel;
 
 @{
     ViewData["Title"] = "Register";
+    var otpCode = "";
     if (Model.userName != null)
     {
         Layout = "~/Views/Shared/_layout.cshtml";
@@ -9,6 +11,10 @@
     else
     {
         Layout = "~/Views/Shared/_layoutPublic.cshtml";
+    }
+    if (ViewBag.otp != null && ViewBag.otp != "")
+    {
+        otpCode = IdMasking.Encode(ViewBag.otp);
     }
 }
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -33,7 +39,8 @@
             <input type="hidden" id="fileSizeLimit" value="@Model.fileLimit?.fileLimits?.FirstOrDefault()?.dayFileSize" />
             <input type="hidden" id="fileLimit" value="@Model.fileLimit?.fileLimits?.FirstOrDefault()?.dayFileNo" />
             <form asp-action="Index" asp-controller="Home" asp-area="Home" method="POST" enctype="multipart/form-data" class="relative">
-                <input type="hidden" id="cId" value="@DropSpace.Helpers.IdMasking.Encode("1")"/>
+                <input type="hidden" id="cId" value="@DropSpace.Helpers.IdMasking.Encode("1")" />
+                <input type="hidden" name="newId" id="newId" value="@ViewBag.otp">
                 <!-- Personal Information Section -->
                 <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg border-2 mb-3">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">ঘটনার তথ্য ও অবস্থান</h2>
@@ -184,14 +191,14 @@
         let MAX_TOTAL_FILES;
         let MAX_FILE_SIZE_MB_BANGLA
         let MAX_TOTAL_FILES_BANGLA
+        let enCode
         $(document).ready(function () {
             $('#timeOf').mdtimepicker();
 
             if ('@Model.userName' != null && '@Model.userName' != '' && '@Model.userName' != 'null') {
                 $('.active').removeClass('active');
                 $('#upload').addClass('active');
-
-                $('#mobileNumber').val('@(Model.userName != null ? DropSpace.Helpers.IdMasking.Decode(Model.userName.ToString()) : "")');
+                $('#mobileNumber').val('@User.Identity.Name');
                 $('#mobileNumber').prop('disabled', true);
                 $('#sendOTPButton').addClass('hidden');
                 $('#otpSection').addClass('hidden');
@@ -393,17 +400,12 @@
 
         let selectedFiles = []; 
         
-
-        
         function convertToBanglaNumber(number) {
             const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
             return number.toString().split('').map(digit => banglaDigits[digit] || digit).join('');
-        }
-
-        
+        }        
 
         function handleFiles(event) {
-            debugger
             const files = event.target.files;
 
             
@@ -449,8 +451,6 @@
             validateForm();
         }
 
-
-
         function updateFileListDisplay() {
             const $fileList = $('#fileList');
 
@@ -492,9 +492,11 @@
             validateForm();
         }
 
-
-
         function validateForm() {
+            if ('@User.Identity.Name' != '' && '@otpCode' != null && '@otpCode' != '' && '@otpCode' != 'null') {
+                enCode = '@otpCode';
+            }
+            $('#newId').val(enCode);
             const basicValidation =
                 $('#type').val() &&  
                 $('#dateOf').val() && 
@@ -505,8 +507,8 @@
                 $('#thana').val() &&
                 $('#union').val() &&
                 $('#village').val() &&
+                ($('#newId').val()||'@User.Identity.Name'!='') &&
                 $('#fileList .flex').length > 0;
-
             const hasPrefilledMobile = '@Model.userName' != null &&
                 '@Model.userName' != '' &&
                 '@Model.userName' != 'null';
@@ -565,7 +567,6 @@
         }
 
         function verifyOTP() {
-            debugger
             const otp = $('#otpInputs input').map(function () { return $(this).val(); }).get().join('');
             const mobileNumber = $('#mobileNumber').val();
 
@@ -574,11 +575,12 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ mobileNumber, otp }),
-                success: function () {
+                success: function (res) {
+                    console.log(res)
                     $('#verifyOTPButton').addClass('hidden');
                     $('#verifyOTPButtonSuccess').removeClass('hidden');
                     $('#submitButton').removeClass('hidden');
-
+                    enCode = res.otpEn;
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',

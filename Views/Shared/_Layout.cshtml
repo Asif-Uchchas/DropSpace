@@ -281,9 +281,9 @@
 
                 <!-- Profile -->
                 <div class="dropdown">
-                    <a class="btn btn-link text-dark d-flex align-items-center" href="/Home/Home/Index">
+                    <a class="btn btn-link text-dark d-flex align-items-center" href="/Auth/Account/Logout">
                         <img src="~/Assets/user.svg" alt="Profile" class="rounded-circle me-2 mr-2" style="width: 30px; height: 30px;">
-                        <span class="fw-bold">@(ViewBag.userName != null ? IdMasking.Decode(ViewBag.userName.ToString()) : "Username")</span>
+                        <span class="fw-bold">@(User.Identity.Name != null && User.Identity.Name!=" " ? User.Identity.Name.ToString() : "Username")</span>
                     </a>
                     @* <button class="btn btn-link text-dark d-flex align-items-center" data-bs-toggle="dropdown">
                         <img src="/api/placeholder/32/32" alt="Profile" class="rounded-circle me-2">

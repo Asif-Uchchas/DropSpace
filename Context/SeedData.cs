@@ -56,6 +56,7 @@ namespace DropSpace.Context
                     UserName = "opususer",
                     Email = "info@opus-bd.com",
                     userType = userTypeId,
+                    isActive=1,
                     createdAt = DateTime.Now,
                     createdBy = "system"
                 };
@@ -74,6 +75,7 @@ namespace DropSpace.Context
                     UserName = "opusadmin",
                     Email = "info@opus-bd.com",
                     userType = userTypeId,
+                    isActive = 1,
                     createdAt = DateTime.Now,
                     createdBy = "system"
                 };
