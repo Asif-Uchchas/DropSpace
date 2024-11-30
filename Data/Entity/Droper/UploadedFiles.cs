@@ -12,5 +12,6 @@ namespace DropSpace.Data.Entity.Droper
         public string? shortUrl { get; set; }
         public string? newFileName { get; set; }
         public string? oldFileName { get; set; }
+        public decimal? fileSize { get; set; }
     }
 }

@@ -118,38 +118,6 @@ namespace DropSpace.Areas.Auth.Controllers
             return View();
         }
 
-
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> UserList()
-        {
-            var roles = await _roleManager.Roles.ToListAsync();
-            List<ApplicationRoleViewModel> lstRole = new List<ApplicationRoleViewModel>();
-            foreach (var data in roles)
-            {
-                ApplicationRoleViewModel modelr = new ApplicationRoleViewModel
-                {
-                    RoleId = data.Id,
-                    RoleName = data.Name
-                };
-                if (data.Name == "admin")
-                {
-
-                }
-                else
-                {
-                    lstRole.Add(modelr);
-                }
-            }
-
-            UserListViewModel model = new UserListViewModel
-            {
-                //aspNetUsersViewModels = await _userInfoServices.GetUserInfo(),
-                userRoles = lstRole,
-            };
-            return View(model);
-        }
-
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -168,7 +136,6 @@ namespace DropSpace.Areas.Auth.Controllers
                 return RedirectToAction("Index", "Home");
             }
         }
-
 
         [HttpPost]
         [Route("api/[area]/[controller]/[action]")]
@@ -250,6 +217,7 @@ namespace DropSpace.Areas.Auth.Controllers
                 return StatusCode(500, new { success = false, message = "An error occurred while verifying OTP" });
             }
         }
+
         public class ReturnObject
         {
             public string status { get; set; }

@@ -30,7 +30,7 @@
                     {
                         case "video":
                             <video class="w-full h-full object-cover cursor-pointer" controls preload="metadata">
-                                <source src="/Home/Media/StreamVideo?link=@file.shortUrl" type="video/mp4">
+                                <source src="/Home/Media/StreamVideo?link=@DropSpace.Helpers.IdMasking.Encode(file.shortUrl)" type="video/mp4">
                             </video>
                             break;
 
@@ -67,7 +67,7 @@
                     <span class="text-sm text-gray-600 truncate max-w-[60%]" title="@file.oldFileName">
                         @file.oldFileName
                     </span>
-                    <a href="/Home/Media/StreamVideo?link=@file.shortUrl"
+                    <a href="/Home/Media/StreamVideo?link=@DropSpace.Helpers.IdMasking.Encode(file.shortUrl)"
                        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
                        download>
                         Download
@@ -81,7 +81,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            debugger
                 var mobile = '@ViewBag.userName';
                 var otp = '@ViewBag.otp';
 

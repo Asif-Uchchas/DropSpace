@@ -111,6 +111,9 @@ namespace DropSpace.Migrations
                     b.Property<int?>("isActive")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("isWhiteList")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime?>("updatedAt")
                         .HasColumnType("datetime2");
 
@@ -280,6 +283,9 @@ namespace DropSpace.Migrations
 
                     b.Property<int?>("crimeTypeId")
                         .HasColumnType("int");
+
+                    b.Property<decimal?>("fileSize")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("isDelete")
                         .HasColumnType("int");

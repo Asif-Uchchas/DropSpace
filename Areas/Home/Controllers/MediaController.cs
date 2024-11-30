@@ -7,23 +7,25 @@ using System.Text.Json;
 using DropSpace.ERPServices.PersonData.Interfaces;
 using DropSpace.Helpers;
 using Microsoft.AspNetCore.Authorization;
+using DropSpace.Data.Entity;
+using Microsoft.AspNetCore.Identity;
 
 namespace DropSpace.Areas.Home.Controllers
 {
     [Area("Home")]
+    [Authorize(Roles = "Public")]
     public class MediaController : Controller
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IPersonData _persondata;
+        private readonly UserManager<ApplicationUser> _userManager;
         private static string rootPath;
 
-        public MediaController(IPersonData persondata, IWebHostEnvironment webHostEnvironment)
+        public MediaController(IPersonData persondata,UserManager<ApplicationUser> userManager)
         {
             _persondata = persondata;
-            _webHostEnvironment = webHostEnvironment;
+            _userManager = userManager;
             rootPath = "D:\\FileManagement";
         }
-        [Authorize(Roles = "Public")]
         public async Task<IActionResult> Index(string mobile, string otp)
         {
             ViewBag.userName = mobile;
@@ -66,7 +68,6 @@ namespace DropSpace.Areas.Home.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Public")]
         [Route("api/[area]/[controller]/[action]")]
         public async Task<IActionResult> GetPersonDataByMobile([FromBody] MasterDataViewModel model)
         {
@@ -77,6 +78,7 @@ namespace DropSpace.Areas.Home.Controllers
             }
             return Json(personData);
         }
+
         private string GetFileType(string url)
         {
             if (string.IsNullOrEmpty(url)) return "other";
@@ -90,23 +92,27 @@ namespace DropSpace.Areas.Home.Controllers
             };
         }
 
-        [Authorize(Roles = "Public")]
         public async Task<IActionResult> StreamVideo(string link)
         {
             try
             {
-                var file = await _persondata.GetUrlFromShortUrl(link);
-
+                var file = await _persondata.GetUrlFromShortUrl(IdMasking.Decode(link));
+                var user = await _userManager.FindByNameAsync(User.Identity.Name);
                 var filePath = Path.Combine(rootPath, User.Identity.Name, file.attachmentUrl);
-
-                if (!System.IO.File.Exists(filePath))
+                if (user.isActive == 1)
                 {
-                    return NotFound("Video file not found.");
+                    if (!System.IO.File.Exists(filePath))
+                    {
+                        return NotFound("Video file not found.");
+                    }
+
+                    var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                    return File(stream, "video/"+Path.GetExtension(filePath), file.oldFileName);
                 }
-
-                var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                return File(stream, "video/mp4", file.oldFileName);
-
+                else
+                {
+                    return Json("Account is disabled");
+                }
             }
             catch (Exception)
             {
