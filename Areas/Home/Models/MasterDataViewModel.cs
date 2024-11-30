@@ -56,5 +56,6 @@
         public string? mobile { get; set; }
         public string? unionId { get; set; }
         public string? villageId { get; set; }
+        public string? newId { get; set; }
     }
 }

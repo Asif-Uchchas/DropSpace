@@ -10,5 +10,7 @@ namespace DropSpace.Data.Entity.Droper
         public CrimeInfo? crimeType { get; set; }
         public string? attachmentUrl { get; set; }
         public string? shortUrl { get; set; }
+        public string? newFileName { get; set; }
+        public string? oldFileName { get; set; }
     }
 }

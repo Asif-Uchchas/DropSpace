@@ -50,64 +50,36 @@ namespace DropSpace.Areas.Auth.Controllers
             this.userInfoes = userInfoes;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-        [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(string returnUrl = null)
-        {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
-        }
-
-
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        [Route("api/[area]/[controller]/[action]")]
+        public async Task<IActionResult> Login([FromBody] MasterDataViewModel model)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
-            if (!ModelState.IsValid)
+            var userInfos = await userInfoes.GetUserInfoByUser(model.mId);
+            var lastOtp = await _mobilePhoneValidation.GetUserLastOtp(model.mId);
+            var obj = new ReturnObject
             {
-                return View(model);
-            }
 
-            var userInfos = await userInfoes.GetUserInfoByUser(model.Name);
+            };
             if (userInfos == null || userInfos.isActive != 1)
             {
-                ModelState.AddModelError(string.Empty, "Invalid username or account inactive.");
-                return View(model);
+                obj.status = "noUser";
+                return Json(obj);
             }
-
-            var result = await _signInManager.PasswordSignInAsync(model.Name, model.Password, model.RememberMe, lockoutOnFailure: true);
-
-            if (result.Succeeded)
+            if (lastOtp == model.otp)
             {
-                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                {
-                    return Redirect(returnUrl);
-                }
-
-
-                return RedirectToAction("Dashboard", "DashBoard", new { area = "Dboard" });
-            }
-
-            if (result.IsLockedOut)
-            {
-                ModelState.AddModelError(string.Empty, "Account is locked.");
+                await _signInManager.SignInAsync(userInfos, true);
+                obj.status = "success";
+                obj.mobileMask = IdMasking.Encode(userInfos.UserName);
+                obj.otpMask = IdMasking.Encode(lastOtp);
+                return Json(obj);
             }
             else
             {
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                obj.status = "lastOtpNotMatch";
+                return Json(obj);
             }
-
-            return View(model);
         }
 
         [HttpPost]
@@ -146,100 +118,6 @@ namespace DropSpace.Areas.Auth.Controllers
             return View();
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateNewUser(UserInformationModel model)
-        //{
-        //    string? response = "";
-        //    int empId = 0;
-        //    var user = new ApplicationUser { UserName = model.userId, isActive = 1, Email = model.email, bpNo = model.bpNo.Replace("BP","").Replace("CIV",""), PhoneNumber = model.mobile };
-        //    var result = await _userManager.CreateAsync(user, model.password);
-        //    if (result.Succeeded)
-        //    {
-        //        var roleAssign = await _userManager.AddToRoleAsync(user, model.roleId);
-        //        //userInfoes.DeleteUserInfoBeforeRegister(model.UserName);
-        //        var emp = new EmployeeInfo
-        //        {
-        //            nameBangla = model.empNameBn,
-        //            nameEnglish = model.empName,
-        //            employeeCode = model.userId,
-        //            emailAddressPersonal = model.email,
-        //            mobileNumberPersonal = model.mobile,
-        //            designation = model.designationName,
-        //            ApplicationUserId = user.Id,
-        //            freedomFighter = false,
-        //            designationCheck = 1,
-        //            rankId = model.rankId,
-        //            branchId = model.branchId,
-        //            sectionId=model.sectionId,
-        //        };
-        //        empId = await _userInfoServices.SaveEmployeeInformation(emp);
-        //        response = "success";
-        //        if (model.imgUrl != null)
-        //        {
-        //            var baseImge = "";
-        //            if (model.imgUrl.Contains("data:image/"))
-        //            {
-
-        //                if (model.imgUrl.Contains("data:image/png"))
-        //                {
-        //                    baseImge = model.imgUrl.Substring?(22);
-        //                }
-        //                else
-        //                {
-        //                    baseImge = model.imgUrl.Substring?(23);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                baseImge = model.imgUrl;
-        //            }
-
-        //            if (model.imgUrl != null)
-        //            {
-        //                int photoId = 0;
-        //                //if (empId > 0)
-        //                //{
-        //                //    var photoInfo = await photographService.GetPhotographByType(empId, "profile");
-        //                //    if (photoInfo != null)
-        //                //    {
-        //                //        photoId = photoInfo.Id;
-        //                //    }
-        //                //}
-
-        //                byte[] bytes = Convert.FromBase64string?(baseImge);
-        //                Image image;
-        //                using (MemoryStream ms = new MemoryStream(bytes))
-        //                {
-        //                    image = Image.FromStream(ms);
-        //                }
-        //                var randomFileName = Guid.NewGuid().Tostring?().Substring?(0, 8) + ".jpeg";
-        //                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/EmployeePhoto", randomFileName);
-        //                var size = new Size(300, 300);
-        //                var i2 = new Bitmap(image, size);
-        //                i2.Save(path, System.Drawing.Imaging.ImageFormat.Png);
-
-        //                Photograph photograph = new Photograph
-        //                {
-        //                    Id = photoId,
-        //                    employeeId = empId,
-        //                    url = "\\EmployeePhoto\\" + randomFileName,
-        //                    type = "profile"
-        //                };
-        //                await _userInfoServices.SavePhotograph(photograph);
-
-        //            }
-        //            else
-        //            {
-        //                response = "error";
-        //            }
-
-
-        //        }
-
-        //        //return RedirectToAction("UserList","Account",new { area="Auth"});
-        //    }
-        //    return Json(response);
-        //}
 
         [HttpGet]
         [AllowAnonymous]
@@ -272,175 +150,11 @@ namespace DropSpace.Areas.Auth.Controllers
             return View(model);
         }
 
-        //[Authorize(Roles = "Super Admin")]
-        [HttpGet]
-        public async Task<IActionResult> UserRoleCreate()
-        {
-            var roles = await _roleManager.Roles.ToListAsync();
-            List<ApplicationRoleViewModel> lstRole = new List<ApplicationRoleViewModel>();
-            foreach (var data in roles)
-            {
-                ApplicationRoleViewModel model = new ApplicationRoleViewModel
-                {
-                    RoleId = data.Id,
-                    RoleName = data.Name
-                };
-                lstRole.Add(model);
-            }
-            ApplicationRoleViewModel viewModel = new ApplicationRoleViewModel
-            {
-                roleViewModels = lstRole
-            };
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UserIdentityRoleCreate([FromForm] ApplicationRoleViewModel model)
-        {
-            var user = new ApplicationRole(model.RoleName);
-            IdentityResult result = await _roleManager.CreateAsync(user);
-
-            return RedirectToAction(nameof(UserRoleCreate));
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> EditRole([FromForm] ApplicationRoleViewModel model)
-        {
-
-            ApplicationUser user = await _userManager.FindByNameAsync(model.EuserName);
-            //var oldRoleId = _userManager.GetUsersInRoleAsync(model.userName);
-            //var oldRoleName = _roleManager.Roles.SingleOrDefault(r => r.Id == oldRoleId).Name;
-            var roles = await _userManager.GetRolesAsync(user);
-            await _userManager.RemoveFromRolesAsync(user, roles.ToArray());
-
-            if (model.PreRoleId != null)
-            {
-                for (int i = 0; i < model.roleIdList.Length; i++)
-                {
-                    if (!await _userManager.IsInRoleAsync(user, model.roleIdList[i]))
-                    {
-                        await _userManager.AddToRoleAsync(user, model.roleIdList[i]);
-                    }
-                }
-                //await _userManager.RemoveFromRoleAsync(user, model.PreRoleId);
-            }
-
-            return RedirectToAction(nameof(UserList));
-        }
-
-        public async Task<IActionResult> DeleteRoles(string? id)
-        {
-            try
-            {
-                //await _userInfoServices.DeleteRoleById(id);
-                return Json("Success");
-            }
-            catch
-            {
-                return Json("Roles is Already Assigned Someone!!");
-            }
-        }
-
-        public async Task<IActionResult> AssaignRoleToUser()
-        {
-            string? userName = User.Identity.Name;
-            var roles = await _roleManager.Roles.Where(x => x.Name != "Supper Admin").ToListAsync();
-            List<ApplicationRoleViewModel> lstRole = new List<ApplicationRoleViewModel>();
-            foreach (var data in roles)
-            {
-                ApplicationRoleViewModel rolesModel = new ApplicationRoleViewModel
-                {
-                    RoleId = data.Id,
-                    RoleName = data.Name
-                };
-                lstRole.Add(rolesModel);
-            }
-
-            ApplicationRoleViewModel model = new ApplicationRoleViewModel
-            {
-                roleViewModels = lstRole,
-            };
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AssaignRoleToUser([FromForm] ApplicationRoleViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-            //return Json(model);
-            var user = await _userManager.FindByNameAsync(model.userName);
-            //await _userInfoServices.DeleteUserRoleListByUserId(user.Id);
-            if (model.roleIdList.Count() > 0)
-            {
-                for (int i = 0; i < model.roleIdList.Count(); i++)
-                {
-                    await _userManager.AddToRoleAsync(user, model.roleIdList[i]);
-                }
-            }
-
-            return RedirectToAction(nameof(AssaignRoleToUser));
-        }
-
-        //[AllowAnonymous]
-        //[Route("api/Account/GetUserInfoList/")]
-        //[HttpGet]
-        //public async Task<IActionResult> GetUserInfoList()
-        //{
-        //    //var result = await _userInfoServices.GetUserInfo();
-        //    return Json(result);
-        //}
-
-        //[AllowAnonymous]
-        //[Route("api/Account/getUserRoles/{userId}")]
-        //[HttpGet]
-        //public async Task<IActionResult> GetUserInfoList(string? userId)
-        //{
-        //    //var result = await _userInfoServices.GetUserRoleList(userId);
-        //    return Json(result);
-        //}
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
 
-            return RedirectToAction("Login");
-        }
-
-        //[HttpGet]
-        //public async Task<JsonResult> GetSectionByUnit(int unitId)
-        //{
-        //    var data = await _unitOfWork.Sections.FindAll(q=>q.specialBranchUnitId==unitId);
-        //    return Json(data.ToList());
-        //}
-
-
-
-
-        [HttpPost]
-        //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePsswordViewModel model)
-        {
-            try
-            {
-                string? message = "Fail To Update Password";
-                if (ModelState.IsValid)
-                {
-                    var data = await _userManager.ChangePasswordAsync(await _userManager.FindByNameAsync(HttpContext.User.Identity.Name), model.OldPassword, model.Password);
-                    message = data.ToString();
-                }
-                //return RedirectToAction(nameof(PortfolioDashboardController.Index), "Portfolio", new { Message = message });
-                return RedirectToAction("Index", "PortfolioDashboard", new { Area = "Portfolio" });
-            }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-
+            return RedirectToAction("Index", "Home", new { Area = "Home" });
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
@@ -528,13 +242,19 @@ namespace DropSpace.Areas.Auth.Controllers
                 }
 
                 //return Ok(new { success = true, message = "OTP verified successfully" });
-                return Json(new { success = true, message = "OTP verified successfully" });
+                return Json(new { success = true, message = "OTP verified successfully",otpEn=IdMasking.Encode(otp) });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error verifying OTP: {ex.Message}");
                 return StatusCode(500, new { success = false, message = "An error occurred while verifying OTP" });
             }
+        }
+        public class ReturnObject
+        {
+            public string status { get; set; }
+            public string mobileMask { get; set; }
+            public string otpMask { get; set; }
         }
     }
     

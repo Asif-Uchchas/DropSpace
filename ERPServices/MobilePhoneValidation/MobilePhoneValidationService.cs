@@ -25,7 +25,7 @@ namespace DropSpace.ERPServices.MobilePhoneValidation
                 }
 
                 // Set the OTP expiry time (for example, 5 minutes)
-                DateTime otpExpire = DateTime.Now.AddMinutes(5);
+                DateTime otpExpire = DateTime.Now.AddMinutes(10);
 
                 // Log OTP details in the database
                 var otpLog = new OTPLogs
@@ -57,7 +57,7 @@ namespace DropSpace.ERPServices.MobilePhoneValidation
             {
                 // Retrieve the OTP log from the database for the given mobile number
                 var otpLog = _context.oTPLogs
-                    .FirstOrDefault(log => log.userName == mobileNumber && log.otp == otp && log.otpExpire > DateTime.Now);
+                    .FirstOrDefault(log => log.userName == mobileNumber && log.otp == otp && log.isVerified==false && log.otpExpire > DateTime.Now);
 
                 if (otpLog == null)
                 {
@@ -79,6 +79,11 @@ namespace DropSpace.ERPServices.MobilePhoneValidation
         public async Task<string> GetUserOtp(string mobileNumber)
         {
             var otp = await _context.oTPLogs.Where(x => x.userName == mobileNumber && x.isVerified == true && x.otpExpire.Value.Date == DateTime.Now.Date).OrderBy(x => x.Id).LastOrDefaultAsync();
+            return otp.otp;
+        }
+        public async Task<string> GetUserLastOtp(string mobileNumber)
+        {
+            var otp = await _context.oTPLogs.Where(x => x.userName == mobileNumber).OrderBy(x => x.Id).LastOrDefaultAsync();
             return otp.otp;
         }
     }

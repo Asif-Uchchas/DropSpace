@@ -1,4 +1,5 @@
 ﻿using DropSpace.Areas.Home.Models;
+using DropSpace.Data.Entity;
 using DropSpace.Data.Entity.Droper;
 using DropSpace.Data.Entity.MasterData;
 using DropSpace.ERPServices.MasterData.Interfaces;
@@ -10,6 +11,7 @@ using DropSpace.Models;
 using DropSpace.Repository.Contracts;
 using DropSpace.Services.Filehandling.Interfaces;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic.FileIO;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
@@ -23,6 +25,8 @@ namespace DropSpace.Areas.Home.Controllers
     [Area("Home")]
     public class HomeController : Controller
     {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IPersonData _persondata;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IMasterData _masterdata;
@@ -31,8 +35,10 @@ namespace DropSpace.Areas.Home.Controllers
         private readonly IFileHandlingService _fileHandlingService;
         private static Random random = new Random();
 
-        public HomeController(IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment, IFileHandlingService fileHandlingService, IMobilePhoneValidation mobilePhoneValidation)
+        public HomeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager,IPersonData persondata, IMasterData masterData, IGenericRepository<CrimeInfo> repoCrimeInfo, IWebHostEnvironment webHostEnvironment, IFileHandlingService fileHandlingService, IMobilePhoneValidation mobilePhoneValidation)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
             _persondata = persondata;
             _webHostEnvironment = webHostEnvironment;
             _masterdata = masterData;
@@ -47,6 +53,7 @@ namespace DropSpace.Areas.Home.Controllers
             var crimeType = await _repoCrimeInfo.FindAll();
             if (userName != null && userName != "")
             {
+                userName=IdMasking.Encode(User.Identity.Name);
                 ViewBag.otp = await _mobilePhoneValidation.GetUserOtp(IdMasking.Decode(userName));
                 ViewBag.userName = userName;
             }
@@ -65,11 +72,34 @@ namespace DropSpace.Areas.Home.Controllers
 
         [HttpPost]
         [RequestSizeLimit(2147483648)] // 2GB limit
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index([FromForm] PersonsDataViewModel personsData, [FromForm] IFormFileCollection files)
         {
             var uploadSettings = await _fileHandlingService.GetFileUploadSettingsAsync();
             var fileLimits = uploadSettings.fileLimits.FirstOrDefault();
             var crimeTypes = await _repoCrimeInfo.FindAll();
+            var userName = User.Identity.Name;
+            var user = new ApplicationUser();
+            if (userName == null)
+            {
+                userName = personsData.mobile;
+            }
+            user = await _userManager.FindByNameAsync(userName);
+            var lastOtp = await _mobilePhoneValidation.GetUserLastOtp(personsData.mobile);
+            if (user == null && IdMasking.Decode(personsData.newId)== lastOtp)
+            {
+                user = new ApplicationUser { UserName = personsData.mobile, userType = 1,isActive=0, createdAt = DateTime.Now, createdBy = "Otp Verified", isWhiteList = false };
+                var result = await _userManager.CreateAsync(user, userName+"@#$%!@#$"+DateTime.Now.ToString("yyyyMMddHHmmss"));
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "Public");
+                    await _signInManager.SignInAsync(user, true);
+                }
+            }
+            else if (user != null && IdMasking.Decode(personsData.newId) == lastOtp)
+            {
+                await _signInManager.SignInAsync(user, true);
+            }
             var model = new IndexViewModel
             {
                 userName = IdMasking.Encode(personsData.mobile),
@@ -80,10 +110,17 @@ namespace DropSpace.Areas.Home.Controllers
                     crimeTypeNameBn = x.crimeType
                 })
             };
+            #region Validation
             if (string.IsNullOrWhiteSpace(personsData?.typeId) && (files == null || files.Count == 0))
             {
                 model.MessageType = "error";
                 model.Message = "invalid_input";
+                return View(model);
+            }
+            if (user==null)
+            {
+                model.MessageType = "error";
+                model.Message = "You are not authorize";
                 return View(model);
             }
 
@@ -119,12 +156,11 @@ namespace DropSpace.Areas.Home.Controllers
                 model.Message = $"File {files[0].FileName} exceeds the maximum size of {fileLimit.totalFileSize} MB.";
                 return View(model);
             }
-
+            #endregion
 
             int crimeType = Convert.ToInt32(IdMasking.Decode(personsData?.typeId));
             int? unionId = personsData?.unionId != null ? (int?)Convert.ToInt32(IdMasking.Decode(personsData.unionId)) : null;
             int? villageId = personsData?.villageId != null ? (int?)Convert.ToInt32(IdMasking.Decode(personsData.villageId)) : null;
-
             var personalData = new PersonsData
             {
                 latitude = personsData.latitude,
@@ -141,7 +177,8 @@ namespace DropSpace.Areas.Home.Controllers
 
             if (files != null && files.Count ==1)
             {
-                string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "ufile");
+
+                string uploadFolder = Path.Combine("D:\\FileManagement", personsData.mobile);
                 if (!Directory.Exists(uploadFolder))
                 {
                     Directory.CreateDirectory(uploadFolder);
@@ -149,8 +186,10 @@ namespace DropSpace.Areas.Home.Controllers
 
                 List<string> warningFiles = new List<string>();
                 List<UploadedFiles> uploadedFilesList = new List<UploadedFiles>();
-
-                string filePath = Path.Combine(uploadFolder, files[0].FileName);
+                var ext = Path.GetExtension(files[0].FileName);
+                var fileNewName = Guid.NewGuid()+DateTime.Now.ToString("yyyyMMddHHmmss");
+                var fileName = Path.GetFileNameWithoutExtension(files[0].FileName);
+                string filePath = Path.Combine(uploadFolder, fileNewName+ ext);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await files[0].CopyToAsync(stream);
@@ -176,8 +215,10 @@ namespace DropSpace.Areas.Home.Controllers
                 {
                     personsDataId = personsDataId,
                     crimeTypeId = crimeType,
-                    attachmentUrl = Path.Combine("ufile", files[0].FileName),
+                    attachmentUrl = fileNewName + ext,
                     shortUrl= shortUrl,
+                    newFileName= fileNewName+ ext,
+                    oldFileName=files[0].FileName
                 });
 
                 if (uploadedFilesList.Any())
@@ -199,6 +240,7 @@ namespace DropSpace.Areas.Home.Controllers
             {
                 model.userName = IdMasking.Encode(personsData.mobile);
                 ViewBag.otp = await _mobilePhoneValidation.GetUserOtp(personsData.mobile);
+                ViewBag.userName = IdMasking.Encode(personsData.mobile);
             }
             return View(model);
         }
