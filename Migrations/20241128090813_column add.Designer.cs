@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DropZone_BackPanel.Migrations
+namespace DropSpace.Migrations
 {
     [DbContext(typeof(DropSpaceDbContext))]
     [Migration("20241128090813_column add")]
