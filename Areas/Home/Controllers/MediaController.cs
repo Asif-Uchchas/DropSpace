@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.Json;
 using DropSpace.ERPServices.PersonData.Interfaces;
 using DropSpace.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DropSpace.Areas.Home.Controllers
 {
@@ -20,7 +21,7 @@ namespace DropSpace.Areas.Home.Controllers
             _persondata = persondata;
             _webHostEnvironment = webHostEnvironment;
         }
-
+        [Authorize(Roles ="Public")]
         public async Task<IActionResult> Index(string mobile, string otp)
         {
             ViewBag.userName=mobile;
@@ -38,7 +39,7 @@ namespace DropSpace.Areas.Home.Controllers
                     foreach (var item1 in item0.UploadedFiles)
                     {
 
-                        var serverPath = Path.Combine(_webHostEnvironment.WebRootPath, item1.AttachmentUrl);
+                        var serverPath = Path.Combine("D:\\FileManagement", IdMasking.Decode(mobile), item1.AttachmentUrl);
 
                         // Validate file exists
                         if (System.IO.File.Exists(serverPath))
@@ -47,7 +48,11 @@ namespace DropSpace.Areas.Home.Controllers
                             {
                                 // Use a web-accessible path
                                 Url = $"/{item1.AttachmentUrl}",
-                                FileType = GetFileType(item1.AttachmentUrl)
+                                FileType = GetFileType(item1.AttachmentUrl),
+                                crimeType=item1.crimeType.crimeType,
+                                shortUrl=item1.shortUrl,
+                                newFileName=item1.newFileName,
+                                oldFileName=item1.oldFileName
                             });
                         }
                     }

@@ -56,7 +56,7 @@ namespace DropSpace.ERPServices.PersonData
             {
                 var personIds = personDataList.Select(p => p.Id).ToList();
                 var uploadedFiles = await _context.uploadedFiles
-                    .Where(uf => personIds.Contains((int)uf.personsDataId))
+                    .Where(uf => personIds.Contains((int)uf.personsDataId)).Include(x=>x.crimeType)
                     .Select(uf => new {
                         uf.personsDataId,
                         FileDto = new UploadedFileDto
@@ -65,6 +65,11 @@ namespace DropSpace.ERPServices.PersonData
                             AttachmentUrl = uf.attachmentUrl,
                             uploadDatetime=uf.createdAt,
                             CreatedAt = uf.createdAt,
+                            crimeType=uf.crimeType,
+                            crimeTypeId=uf.crimeTypeId,
+                            newFileName=uf.newFileName,
+                            oldFileName=uf.oldFileName,
+                            shortUrl = uf.shortUrl
                         }
                     })
                     .ToListAsync();

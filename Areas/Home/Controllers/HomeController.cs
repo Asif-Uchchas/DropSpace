@@ -240,6 +240,7 @@ namespace DropSpace.Areas.Home.Controllers
             {
                 model.userName = IdMasking.Encode(personsData.mobile);
                 ViewBag.otp = await _mobilePhoneValidation.GetUserOtp(personsData.mobile);
+                ViewBag.userName = IdMasking.Encode(personsData.mobile);
             }
             return View(model);
         }

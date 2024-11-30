@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using DropSpace.Helpers
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -94,7 +95,7 @@
                     <button class="btn btn-link btn-danger btn-sm text-dark d-flex align-items-center" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         @if (User.Identity.Name != null)
                         {
-                            
+                            <i class="fa fa-sign-in" aria-hidden="true" title="Log Out"></i>
                         }
                         else
                         {
@@ -108,7 +109,7 @@
                         }
                         else
                         {
-                            <li><a class="dropdown-item text-danger" href="/logout">Logout</a></li>
+                            <li><a class="dropdown-item text-danger" href="/Auth/Account/LogOut">Log In</a></li>
                         }
                     </ul>
                 </div>

@@ -1,4 +1,6 @@
-﻿namespace DropSpace.Areas.Home.Models
+﻿using DropSpace.Data.Entity.MasterData;
+
+namespace DropSpace.Areas.Home.Models
 {
     public class PersonDataWithFilesDto
     {
@@ -22,6 +24,11 @@
     {
         public int Id { get; set; }
         public string? AttachmentUrl { get; set; }
+        public int? crimeTypeId { get; set; }
+        public CrimeInfo? crimeType { get; set; }
+        public string? shortUrl { get; set; }
+        public string? newFileName { get; set; }
+        public string? oldFileName { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? uploadDatetime { get; set; }
     }
